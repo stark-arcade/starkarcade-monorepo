@@ -1,4 +1,4 @@
-import { ChainDocument, Chains } from '@app/shared/models';
+import { ChainDocument, Chains } from '@app/shared/models/schemas';
 import { Web3Service } from '@app/web3/web3.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';

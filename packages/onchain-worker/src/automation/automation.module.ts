@@ -3,7 +3,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AutomationService } from './automation.service';
 import { Web3Module } from '@app/web3/web3.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ChainSchema, Chains } from '@app/shared/models';
+import { ChainSchema, Chains } from '@app/shared/models/schemas';
 
 @Module({
   imports: [
