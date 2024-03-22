@@ -18,6 +18,18 @@ To install all dependencies, run the following command:
 yarn install
 ```
 
+## Installing libraries for a specific Package
+
+```shell
+yarn workspace <package name> add <library>
+```
+
+Replace `<package name>` with the name of the package you want to install library. For example, to install starknet the `onchain-worker` package, run:
+
+```shell
+yarn workspace onchain-worker add starknet@next
+```
+
 ## Starting a Package
 
 To start a specific package, use the following command:
