@@ -1,0 +1,283 @@
+[
+    {
+      "type": "impl",
+      "name": "TicketImpl",
+      "interface_name": "lottery::ticket::interface::ITicket"
+    },
+    {
+      "type": "struct",
+      "name": "core::integer::u256",
+      "members": [
+        {
+          "name": "low",
+          "type": "core::integer::u128"
+        },
+        {
+          "name": "high",
+          "type": "core::integer::u128"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "core::array::Span::<core::integer::u32>",
+      "members": [
+        {
+          "name": "snapshot",
+          "type": "@core::array::Array::<core::integer::u32>"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "lottery::ticket::interface::TicketHash",
+      "members": [
+        {
+          "name": "lotteryAddress",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "lotteryId",
+          "type": "core::integer::u128"
+        },
+        {
+          "name": "pickedNumbers",
+          "type": "core::array::Span::<core::integer::u32>"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "lottery::ticket::interface::TicketGetter",
+      "members": [
+        {
+          "name": "ticketId",
+          "type": "core::integer::u128"
+        },
+        {
+          "name": "lotteryAddress",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "lotteryId",
+          "type": "core::integer::u128"
+        },
+        {
+          "name": "pickedNumbers",
+          "type": "core::array::Span::<core::integer::u32>"
+        },
+        {
+          "name": "payOut",
+          "type": "core::integer::u256"
+        },
+        {
+          "name": "user",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "sameCombinationCounter",
+          "type": "core::integer::u128"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "core::array::Span::<core::integer::u128>",
+      "members": [
+        {
+          "name": "snapshot",
+          "type": "@core::array::Array::<core::integer::u128>"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "core::array::Span::<lottery::ticket::interface::TicketGetter>",
+      "members": [
+        {
+          "name": "snapshot",
+          "type": "@core::array::Array::<lottery::ticket::interface::TicketGetter>"
+        }
+      ]
+    },
+    {
+      "type": "interface",
+      "name": "lottery::ticket::interface::ITicket",
+      "items": [
+        {
+          "type": "function",
+          "name": "createTicket",
+          "inputs": [
+            {
+              "name": "pickedNumbers",
+              "type": "core::array::Array::<core::integer::u32>"
+            },
+            {
+              "name": "lotteryId",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "userAddress",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::integer::u128"
+            }
+          ],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "setPaidOut",
+          "inputs": [
+            {
+              "name": "ticketId",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "payOut",
+              "type": "core::integer::u256"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "getCombinationCounter",
+          "inputs": [
+            {
+              "name": "param",
+              "type": "lottery::ticket::interface::TicketHash"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::integer::u128"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "getTicketById",
+          "inputs": [
+            {
+              "name": "ticketId",
+              "type": "core::integer::u128"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "lottery::ticket::interface::TicketGetter"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "getTicketByIds",
+          "inputs": [
+            {
+              "name": "ticketIds",
+              "type": "core::array::Span::<core::integer::u128>"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::array::Span::<lottery::ticket::interface::TicketGetter>"
+            }
+          ],
+          "state_mutability": "view"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getSerializePickedNumbers",
+      "inputs": [
+        {
+          "name": "pickedNumbers",
+          "type": "core::array::Array::<core::integer::u32>"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "core::array::Array::<core::felt252>"
+        }
+      ],
+      "state_mutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "getUserTickets",
+      "inputs": [
+        {
+          "name": "userAddress",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "core::array::Span::<core::integer::u128>"
+        }
+      ],
+      "state_mutability": "view"
+    },
+    {
+      "type": "constructor",
+      "name": "constructor",
+      "inputs": [
+        {
+          "name": "governanceAddress",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "lottery::ticket::ticket::Ticket::TicketCreated",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "ticketId",
+          "type": "core::integer::u128",
+          "kind": "key"
+        },
+        {
+          "name": "user",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "lotteryAddress",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "lotteryId",
+          "type": "core::integer::u128",
+          "kind": "data"
+        },
+        {
+          "name": "pickedNumbers",
+          "type": "core::array::Array::<core::integer::u32>",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "lottery::ticket::ticket::Ticket::Event",
+      "kind": "enum",
+      "variants": [
+        {
+          "name": "TicketCreated",
+          "type": "lottery::ticket::ticket::Ticket::TicketCreated",
+          "kind": "nested"
+        }
+      ]
+    }
+  ]

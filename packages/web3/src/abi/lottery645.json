@@ -1,0 +1,405 @@
+[
+    {
+      "type": "impl",
+      "name": "LotteryImpl",
+      "interface_name": "lottery::lottery::interface::ILottery"
+    },
+    {
+      "type": "struct",
+      "name": "core::array::Span::<core::integer::u32>",
+      "members": [
+        {
+          "name": "snapshot",
+          "type": "@core::array::Array::<core::integer::u32>"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "core::integer::u256",
+      "members": [
+        {
+          "name": "low",
+          "type": "core::integer::u128"
+        },
+        {
+          "name": "high",
+          "type": "core::integer::u128"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "lottery::lottery::interface::LotteryGetterStruct",
+      "members": [
+        {
+          "name": "id",
+          "type": "core::integer::u128"
+        },
+        {
+          "name": "minimumPrice",
+          "type": "core::integer::u256"
+        },
+        {
+          "name": "state",
+          "type": "core::integer::u8"
+        },
+        {
+          "name": "drawTime",
+          "type": "core::integer::u64"
+        },
+        {
+          "name": "drawnNumbers",
+          "type": "core::array::Span::<core::integer::u32>"
+        },
+        {
+          "name": "amountOfTickets",
+          "type": "core::integer::u128"
+        },
+        {
+          "name": "totalValue",
+          "type": "core::integer::u256"
+        },
+        {
+          "name": "jackpot",
+          "type": "core::integer::u256"
+        },
+        {
+          "name": "jackpotWinners",
+          "type": "core::integer::u128"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "core::array::Span::<core::integer::u128>",
+      "members": [
+        {
+          "name": "snapshot",
+          "type": "@core::array::Array::<core::integer::u128>"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "core::array::Span::<lottery::lottery::interface::LotteryGetterStruct>",
+      "members": [
+        {
+          "name": "snapshot",
+          "type": "@core::array::Array::<lottery::lottery::interface::LotteryGetterStruct>"
+        }
+      ]
+    },
+    {
+      "type": "interface",
+      "name": "lottery::lottery::interface::ILottery",
+      "items": [
+        {
+          "type": "function",
+          "name": "manualStartNewLottery",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "buyTicket",
+          "inputs": [
+            {
+              "name": "pickedNumbers",
+              "type": "core::array::Span::<core::integer::u32>"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "startDrawing",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "fulfillDrawing",
+          "inputs": [
+            {
+              "name": "randomWord",
+              "type": "core::felt252"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "claimRewards",
+          "inputs": [
+            {
+              "name": "ticketId",
+              "type": "core::integer::u128"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "getCurrentLottery",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "lottery::lottery::interface::LotteryGetterStruct"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "getLotteryById",
+          "inputs": [
+            {
+              "name": "lotteryId",
+              "type": "core::integer::u128"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "lottery::lottery::interface::LotteryGetterStruct"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "getLotteryByIds",
+          "inputs": [
+            {
+              "name": "lotteryIds",
+              "type": "core::array::Span::<core::integer::u128>"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::array::Span::<lottery::lottery::interface::LotteryGetterStruct>"
+            }
+          ],
+          "state_mutability": "view"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "testGetRandomNumbers",
+      "inputs": [
+        {
+          "name": "randomWord",
+          "type": "core::felt252"
+        },
+        {
+          "name": "totalValue",
+          "type": "core::integer::u256"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "core::array::Span::<core::integer::u32>"
+        }
+      ],
+      "state_mutability": "view"
+    },
+    {
+      "type": "impl",
+      "name": "OwnableImpl",
+      "interface_name": "openzeppelin::access::ownable::interface::IOwnable"
+    },
+    {
+      "type": "interface",
+      "name": "openzeppelin::access::ownable::interface::IOwnable",
+      "items": [
+        {
+          "type": "function",
+          "name": "owner",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "transfer_ownership",
+          "inputs": [
+            {
+              "name": "new_owner",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "renounce_ownership",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "external"
+        }
+      ]
+    },
+    {
+      "type": "constructor",
+      "name": "constructor",
+      "inputs": [
+        {
+          "name": "owner",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "governanceAddress",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "lottery::lottery::lottery645::Lottery645::StartNewLottery",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "id",
+          "type": "core::integer::u128",
+          "kind": "key"
+        },
+        {
+          "name": "drawTime",
+          "type": "core::integer::u64",
+          "kind": "data"
+        },
+        {
+          "name": "jackpot",
+          "type": "core::integer::u256",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "lottery::lottery::lottery645::Lottery645::DrawnNumbers",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "lotteryId",
+          "type": "core::integer::u128",
+          "kind": "key"
+        },
+        {
+          "name": "drawnNumbers",
+          "type": "core::array::Span::<core::integer::u32>",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "lottery::lottery::lottery645::Lottery645::WithdrawWinning",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "userAddress",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "key"
+        },
+        {
+          "name": "lottery",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "lotteryId",
+          "type": "core::integer::u128",
+          "kind": "data"
+        },
+        {
+          "name": "ticketId",
+          "type": "core::integer::u128",
+          "kind": "data"
+        },
+        {
+          "name": "payout",
+          "type": "core::integer::u256",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "openzeppelin::access::ownable::ownable::OwnableComponent::OwnershipTransferred",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "previous_owner",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "new_owner",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "openzeppelin::access::ownable::ownable::OwnableComponent::Event",
+      "kind": "enum",
+      "variants": [
+        {
+          "name": "OwnershipTransferred",
+          "type": "openzeppelin::access::ownable::ownable::OwnableComponent::OwnershipTransferred",
+          "kind": "nested"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "openzeppelin::security::reentrancyguard::ReentrancyGuardComponent::Event",
+      "kind": "enum",
+      "variants": []
+    },
+    {
+      "type": "event",
+      "name": "lottery::lottery::lottery645::Lottery645::Event",
+      "kind": "enum",
+      "variants": [
+        {
+          "name": "StartNewLottery",
+          "type": "lottery::lottery::lottery645::Lottery645::StartNewLottery",
+          "kind": "nested"
+        },
+        {
+          "name": "DrawnNumbers",
+          "type": "lottery::lottery::lottery645::Lottery645::DrawnNumbers",
+          "kind": "nested"
+        },
+        {
+          "name": "WithdrawWinning",
+          "type": "lottery::lottery::lottery645::Lottery645::WithdrawWinning",
+          "kind": "nested"
+        },
+        {
+          "name": "OwnableEvent",
+          "type": "openzeppelin::access::ownable::ownable::OwnableComponent::Event",
+          "kind": "flat"
+        },
+        {
+          "name": "ReentrancyEvent",
+          "type": "openzeppelin::security::reentrancyguard::ReentrancyGuardComponent::Event",
+          "kind": "flat"
+        }
+      ]
+    }
+  ]

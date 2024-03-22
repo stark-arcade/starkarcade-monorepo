@@ -1,0 +1,536 @@
+[
+    {
+      "type": "impl",
+      "name": "GovernanceImpl",
+      "interface_name": "lottery::governance::interface::IGovernance"
+    },
+    {
+      "type": "struct",
+      "name": "core::integer::u256",
+      "members": [
+        {
+          "name": "low",
+          "type": "core::integer::u128"
+        },
+        {
+          "name": "high",
+          "type": "core::integer::u128"
+        }
+      ]
+    },
+    {
+      "type": "enum",
+      "name": "core::bool",
+      "variants": [
+        {
+          "name": "False",
+          "type": "()"
+        },
+        {
+          "name": "True",
+          "type": "()"
+        }
+      ]
+    },
+    {
+      "type": "interface",
+      "name": "lottery::governance::interface::IGovernance",
+      "items": [
+        {
+          "type": "function",
+          "name": "changeAdmin",
+          "inputs": [
+            {
+              "name": "newAdmin",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "changeTicket",
+          "inputs": [
+            {
+              "name": "newTicketContract",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "changeRandomness",
+          "inputs": [
+            {
+              "name": "newRandom",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "changeMinimumPrice",
+          "inputs": [
+            {
+              "name": "lottery",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "newMinPrice",
+              "type": "core::integer::u256"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "changeInitialJackpot",
+          "inputs": [
+            {
+              "name": "lottery",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "newInitJackPot",
+              "type": "core::integer::u256"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "changeDuration",
+          "inputs": [
+            {
+              "name": "lottery",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "newDuration",
+              "type": "core::integer::u64"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "createLottery",
+          "inputs": [
+            {
+              "name": "lottery",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "minimumPrice",
+              "type": "core::integer::u256"
+            },
+            {
+              "name": "duration",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "initialJackpot",
+              "type": "core::integer::u256"
+            },
+            {
+              "name": "increaseJackpot",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "firstDrawTime",
+              "type": "core::integer::u64"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "cancelLottery",
+          "inputs": [
+            {
+              "name": "lottery",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "payTicketPrice",
+          "inputs": [
+            {
+              "name": "buyer",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "payoutWinner",
+          "inputs": [
+            {
+              "name": "winner",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "amount",
+              "type": "core::integer::u256"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "computeGrowingJackPot",
+          "inputs": [
+            {
+              "name": "lottery",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "totalValue",
+              "type": "core::integer::u256"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::integer::u256"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "getAdmin",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "getRandomnessContract",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "getTicketContract",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "validateLottery",
+          "inputs": [
+            {
+              "name": "lottery",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::bool"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "getMinimumPrice",
+          "inputs": [
+            {
+              "name": "lottery",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::integer::u256"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "getDuration",
+          "inputs": [
+            {
+              "name": "lottery",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::integer::u64"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "getInitialJackpot",
+          "inputs": [
+            {
+              "name": "lottery",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::integer::u256"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "getFirstDrawtime",
+          "inputs": [
+            {
+              "name": "lottery",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::integer::u64"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "getActiveLotteries",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
+            }
+          ],
+          "state_mutability": "view"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCurrency",
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ],
+      "state_mutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "getTotalBalance",
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "core::integer::u256"
+        }
+      ],
+      "state_mutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "withdrawBalance",
+      "inputs": [
+        {
+          "name": "amount",
+          "type": "core::integer::u256"
+        }
+      ],
+      "outputs": [],
+      "state_mutability": "external"
+    },
+    {
+      "type": "function",
+      "name": "topupPool",
+      "inputs": [
+        {
+          "name": "amount",
+          "type": "core::integer::u256"
+        }
+      ],
+      "outputs": [],
+      "state_mutability": "external"
+    },
+    {
+      "type": "function",
+      "name": "updateCurrency",
+      "inputs": [
+        {
+          "name": "currency",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ],
+      "outputs": [],
+      "state_mutability": "external"
+    },
+    {
+      "type": "impl",
+      "name": "OwnableImpl",
+      "interface_name": "openzeppelin::access::ownable::interface::IOwnable"
+    },
+    {
+      "type": "interface",
+      "name": "openzeppelin::access::ownable::interface::IOwnable",
+      "items": [
+        {
+          "type": "function",
+          "name": "owner",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "transfer_ownership",
+          "inputs": [
+            {
+              "name": "new_owner",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "renounce_ownership",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "external"
+        }
+      ]
+    },
+    {
+      "type": "impl",
+      "name": "OwnableCamelOnlyImpl",
+      "interface_name": "openzeppelin::access::ownable::interface::IOwnableCamelOnly"
+    },
+    {
+      "type": "interface",
+      "name": "openzeppelin::access::ownable::interface::IOwnableCamelOnly",
+      "items": [
+        {
+          "type": "function",
+          "name": "transferOwnership",
+          "inputs": [
+            {
+              "name": "newOwner",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "renounceOwnership",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "external"
+        }
+      ]
+    },
+    {
+      "type": "constructor",
+      "name": "constructor",
+      "inputs": [
+        {
+          "name": "admin",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "currency",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "openzeppelin::access::ownable::ownable::OwnableComponent::OwnershipTransferred",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "previous_owner",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "new_owner",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "openzeppelin::access::ownable::ownable::OwnableComponent::Event",
+      "kind": "enum",
+      "variants": [
+        {
+          "name": "OwnershipTransferred",
+          "type": "openzeppelin::access::ownable::ownable::OwnableComponent::OwnershipTransferred",
+          "kind": "nested"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "openzeppelin::security::reentrancyguard::ReentrancyGuardComponent::Event",
+      "kind": "enum",
+      "variants": []
+    },
+    {
+      "type": "event",
+      "name": "lottery::governance::governance::Governance::Event",
+      "kind": "enum",
+      "variants": [
+        {
+          "name": "OwnableEvent",
+          "type": "openzeppelin::access::ownable::ownable::OwnableComponent::Event",
+          "kind": "flat"
+        },
+        {
+          "name": "ReentrancyEvent",
+          "type": "openzeppelin::security::reentrancyguard::ReentrancyGuardComponent::Event",
+          "kind": "flat"
+        }
+      ]
+    }
+  ]

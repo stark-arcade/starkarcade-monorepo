@@ -1,0 +1,335 @@
+[
+    {
+      "type": "impl",
+      "name": "RandomnessImpl",
+      "interface_name": "lottery::randomness::interface::IRandomness"
+    },
+    {
+      "type": "struct",
+      "name": "core::array::Span::<core::felt252>",
+      "members": [
+        {
+          "name": "snapshot",
+          "type": "@core::array::Array::<core::felt252>"
+        }
+      ]
+    },
+    {
+      "type": "interface",
+      "name": "lottery::randomness::interface::IRandomness",
+      "items": [
+        {
+          "type": "function",
+          "name": "getRandom",
+          "inputs": [
+            {
+              "name": "signature",
+              "type": "core::array::Span::<core::felt252>"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "receive_random_words",
+          "inputs": [
+            {
+              "name": "requestor_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "request_id",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "random_words",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "calldata",
+              "type": "core::array::Array::<core::felt252>"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "updateVRFContract",
+      "inputs": [
+        {
+          "name": "newVRFContract",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ],
+      "outputs": [],
+      "state_mutability": "external"
+    },
+    {
+      "type": "function",
+      "name": "updateMinBlockStorage",
+      "inputs": [
+        {
+          "name": "minBlockStorage",
+          "type": "core::integer::u64"
+        }
+      ],
+      "outputs": [],
+      "state_mutability": "external"
+    },
+    {
+      "type": "function",
+      "name": "updatePublishDelay",
+      "inputs": [
+        {
+          "name": "publishDelay",
+          "type": "core::integer::u64"
+        }
+      ],
+      "outputs": [],
+      "state_mutability": "external"
+    },
+    {
+      "type": "function",
+      "name": "updateCallbackFeeLimit",
+      "inputs": [
+        {
+          "name": "callbackFeeLimit",
+          "type": "core::integer::u128"
+        }
+      ],
+      "outputs": [],
+      "state_mutability": "external"
+    },
+    {
+      "type": "function",
+      "name": "updateGovernanceContract",
+      "inputs": [
+        {
+          "name": "newgovernanceContract",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ],
+      "outputs": [],
+      "state_mutability": "external"
+    },
+    {
+      "type": "struct",
+      "name": "core::integer::u256",
+      "members": [
+        {
+          "name": "low",
+          "type": "core::integer::u128"
+        },
+        {
+          "name": "high",
+          "type": "core::integer::u128"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "topupETH",
+      "inputs": [
+        {
+          "name": "amount",
+          "type": "core::integer::u256"
+        }
+      ],
+      "outputs": [],
+      "state_mutability": "external"
+    },
+    {
+      "type": "function",
+      "name": "withdrawBalance",
+      "inputs": [
+        {
+          "name": "amount",
+          "type": "core::integer::u256"
+        }
+      ],
+      "outputs": [],
+      "state_mutability": "external"
+    },
+    {
+      "type": "function",
+      "name": "aproveVRF",
+      "inputs": [
+        {
+          "name": "amount",
+          "type": "core::integer::u256"
+        }
+      ],
+      "outputs": [],
+      "state_mutability": "external"
+    },
+    {
+      "type": "function",
+      "name": "getTotalETHBalance",
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "core::integer::u256"
+        }
+      ],
+      "state_mutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "getLotteryByRequestId",
+      "inputs": [
+        {
+          "name": "requestId",
+          "type": "core::integer::u64"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ],
+      "state_mutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "getVRFContract",
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ],
+      "state_mutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "changeVRFContract",
+      "inputs": [
+        {
+          "name": "newVRFContract",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ],
+      "outputs": [],
+      "state_mutability": "external"
+    },
+    {
+      "type": "function",
+      "name": "changeGovernance",
+      "inputs": [
+        {
+          "name": "newgovernance",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ],
+      "outputs": [],
+      "state_mutability": "external"
+    },
+    {
+      "type": "impl",
+      "name": "OwnableImpl",
+      "interface_name": "openzeppelin::access::ownable::interface::IOwnable"
+    },
+    {
+      "type": "interface",
+      "name": "openzeppelin::access::ownable::interface::IOwnable",
+      "items": [
+        {
+          "type": "function",
+          "name": "owner",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "transfer_ownership",
+          "inputs": [
+            {
+              "name": "new_owner",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "renounce_ownership",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "external"
+        }
+      ]
+    },
+    {
+      "type": "constructor",
+      "name": "constructor",
+      "inputs": [
+        {
+          "name": "owner",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "ETHAddress",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "vrfContract",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "governanceContract",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "openzeppelin::access::ownable::ownable::OwnableComponent::OwnershipTransferred",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "previous_owner",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "new_owner",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "openzeppelin::access::ownable::ownable::OwnableComponent::Event",
+      "kind": "enum",
+      "variants": [
+        {
+          "name": "OwnershipTransferred",
+          "type": "openzeppelin::access::ownable::ownable::OwnableComponent::OwnershipTransferred",
+          "kind": "nested"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "lottery::randomness::randomness::Randomness::Event",
+      "kind": "enum",
+      "variants": [
+        {
+          "name": "OwnableEvent",
+          "type": "openzeppelin::access::ownable::ownable::OwnableComponent::Event",
+          "kind": "flat"
+        }
+      ]
+    }
+  ]
