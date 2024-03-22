@@ -1,16 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { BaseSchema } from './base.schema';
-import { Document, SchemaTypes } from 'mongoose';
+import { Document } from 'mongoose';
 import { LotteryStatus, PriceMultipliers } from '@app/shared/types';
 
-export type LotteryDocument = Lottery & Document;
+export type LotteryDocument = Lotteries & Document;
 
 @Schema({ timestamps: true })
-export class Lottery extends BaseSchema {
+export class Lotteries extends BaseSchema {
   @Prop()
   address: string;
 
-  @Prop({ type: SchemaTypes.String, enum: LotteryStatus })
+  @Prop({ enum: LotteryStatus })
   status: LotteryStatus;
 
   @Prop()
@@ -31,11 +31,11 @@ export class Lottery extends BaseSchema {
   @Prop()
   jackpot: number;
 
-  @Prop({ type: SchemaTypes.Array })
+  @Prop()
   prizeMultipliers: PriceMultipliers[];
 
-  @Prop({ type: SchemaTypes.Array })
+  @Prop()
   drawnNumber: number[];
 }
 
-export const LotteryDocument = SchemaFactory.createForClass(Lottery);
+export const LotterySchema = SchemaFactory.createForClass(Lotteries);
