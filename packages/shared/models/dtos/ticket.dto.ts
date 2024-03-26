@@ -19,9 +19,6 @@ export class TicketDTO {
   @ArrayUnique()
   pickedNumbers: number[];
 
-  @IsNumber()
-  amount: number;
-
   user: ObjectId;
 
   @IsNumber()
