@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import configuration from '@app/shared/configuration';
 import { Web3Module } from '@app/web3/web3.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { GameItemModule } from './game-item/game-item.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     MongooseModule.forRoot(configuration().db_path),
     Web3Module,
     AutomationModule,
+    GameItemModule,
   ],
   controllers: [AppController],
   providers: [AppService],

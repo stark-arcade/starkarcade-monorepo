@@ -26,10 +26,14 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/schedule": "^4.0.1",
     "@types/dotenv-safe": "^8.1.6",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "mongodb-memory-server": "^9.1.7",
     "mongoose": "^6.0.12",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "shared": "0.0.1",
+    "starknet": "^6.6.0",
     "web3": "0.0.1"
   },
   "devDependencies": {
@@ -70,6 +74,10 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@app/shared(|/.*)$": "<rootDir>/../../packages/shared/$1",
+      "^@app/web3(|/.*)$": "<rootDir>/../../packages/web3/src/$1"
+    }
   }
 }

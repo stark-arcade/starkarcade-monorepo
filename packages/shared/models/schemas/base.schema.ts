@@ -1,14 +1,10 @@
-import { Prop, Schema } from '@nestjs/mongoose';
-import { Date, ObjectId, SchemaTypes } from 'mongoose';
+import { Schema } from '@nestjs/mongoose';
 
 @Schema({ timestamps: true })
 export class BaseSchema {
-  @Prop({ type: SchemaTypes.ObjectId })
-  _id: ObjectId;
+  _id?: string;
 
-  @Prop({ type: SchemaTypes.Date })
-  createdAt: Date;
+  createdAt?: string;
 
-  @Prop({ type: SchemaTypes.Date })
-  updatedAt: Date;
+  updatedAt?: string;
 }

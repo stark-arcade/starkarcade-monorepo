@@ -1,7 +1,7 @@
 export enum LotteryStatus {
-  OPEN = 'OPEN',
-  DRAWING = 'DRAWING',
-  CLOSED = 'CLOSED',
+  OPEN = 1,
+  DRAWING = 2,
+  CLOSED = 0,
 }
 
 export type PriceMultipliers = {

@@ -2,7 +2,9 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { BaseSchema } from './base.schema';
 import { LotteryDocument } from './lottery.schema';
 import { UserDocument } from './user.schema';
-import { SchemaTypes } from 'mongoose';
+import { Document, SchemaTypes } from 'mongoose';
+
+export type TicketDocument = Tickets & Document;
 
 @Schema({ timestamps: true })
 export class Tickets extends BaseSchema {
@@ -15,14 +17,11 @@ export class Tickets extends BaseSchema {
   @Prop({ type: SchemaTypes.Array })
   pickedNumbers: number[];
 
-  @Prop()
-  amount: number;
-
   @Prop({ type: SchemaTypes.ObjectId, ref: 'Users' })
   user: UserDocument;
 
   @Prop()
-  bougthTime: number;
+  boughtTime: number;
 
   @Prop()
   counterRightNumbers?: number;
