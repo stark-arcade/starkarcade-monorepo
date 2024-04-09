@@ -1,9 +1,21 @@
+import { SuccessfulTransactionReceiptResponse } from 'starknet';
+import ticketAbi from '../abi/ticket.json';
+import lotteryAbi from '../abi/lottery645.json';
+
+export enum EventTopic {
+  TICKET_CREATED = '0x2013b4817f658d5d62bc494cf84c1dfa1150756dcf9783d0fc31d8133795c6d',
+  LOTTERY_STARTED = '0x1b009627a191bdefc95afc44ac77f4d4f9d6a4209e8b4461dfbe11530bb1222',
+  DRAWN_NUMBERS = '0x1d9ef9b22b4d2736713032ee746f4f355e05f1b2258bbcfb4489de3f14c67b',
+  WITHDRAW_WINNING = '',
+}
+
 export type LotteryDetail = {
   id: number;
   minimumPrice: number;
   state: number;
+  startTime: number;
   drawTime: number;
-  drawnNumbers: number[];
+  drawnNumbers: bigint[];
   amountOfTickets: number;
   totalValue: number;
   jackpot: number;
@@ -16,7 +28,12 @@ export enum EventType {
   WithdrawWinning = 'WithdrawWinning',
   TicketCreated = 'TicketCreated',
 }
-export type LogsReturnValues = {
+export type LogsReturnValues = SuccessfulTransactionReceiptResponse & {
   returnValues: any;
   eventType: EventType;
+};
+
+export const ABIS = {
+  TicketABI: ticketAbi,
+  LotteryABI: lotteryAbi,
 };

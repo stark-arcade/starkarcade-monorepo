@@ -3,6 +3,8 @@ import { GameItemService } from '../game-item.service';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import {
   ChainDocument,
+  ChainSchema,
+  Chains,
   Lotteries,
   LotterySchema,
   TicketSchema,
@@ -24,8 +26,10 @@ describe('GameItemService', () => {
   let lotteryModel: Model<Lotteries>;
   let ticketModel: Model<Tickets>;
   let userModel: Model<Users>;
+  let chainModel: Model<Chains>;
   let web3Service: Web3Service;
   let provider: Provider;
+  let chainDocument: ChainDocument;
 
   beforeAll(async () => {
     mongod = await MongoMemoryServer.create();
@@ -34,6 +38,7 @@ describe('GameItemService', () => {
     lotteryModel = mongoConnection.model(Lotteries.name, LotterySchema);
     ticketModel = mongoConnection.model(Tickets.name, TicketSchema);
     userModel = mongoConnection.model(Users.name, UserSchema);
+    chainModel = mongoConnection.model(Chains.name, ChainSchema);
     const app: TestingModule = await Test.createTestingModule({
       providers: [
         GameItemService,
@@ -42,11 +47,14 @@ describe('GameItemService', () => {
         { provide: getModelToken(Users.name), useValue: userModel },
         { provide: getModelToken(Lotteries.name), useValue: lotteryModel },
         { provide: getModelToken(Tickets.name), useValue: ticketModel },
+        { provide: getModelToken(Chains.name), useValue: chainModel },
       ],
     }).compile();
     gameService = app.get<GameItemService>(GameItemService);
     web3Service = app.get<Web3Service>(Web3Service);
     provider = new RpcProvider({ nodeUrl: chain.rpc });
+
+    chainDocument = await chainModel.create(chain);
   });
 
   afterAll(async () => {
@@ -64,24 +72,26 @@ describe('GameItemService', () => {
   });
 
   describe('test', () => {
-    it('test', async () => {
+    it('processTicketCreated', async () => {
       const trasactionReceipt = await provider.getTransactionReceipt(
-        '0x030d41a499066a1463029275d114410de8a79a76dcdca4481ecb33c1aad787c9',
+        '0x0546dee18573d57cc9351054dc1d9775d9ba21ef78f199176295227c85af46a3',
       );
 
-      const block = await provider.getBlock(52111);
+      const block = await provider.getBlock(57516);
       const eventWithType = web3Service.getReturnValuesEvent(
         trasactionReceipt,
-        chain as ChainDocument,
+        chainDocument,
         block.timestamp * 1e3,
       );
 
       for (const event of eventWithType) {
-        await gameService.processEvent(event, chain as ChainDocument);
+        await gameService.processEvent(event, chainDocument);
       }
 
-      const tickets = await ticketModel.find();
-      console.log(tickets);
+      const lottery = await lotteryModel.findOne();
+      const ticket = await ticketModel.findOne();
+      const user = await userModel.findOne();
+      console.log({ lottery, ticket, user });
     });
   });
 });

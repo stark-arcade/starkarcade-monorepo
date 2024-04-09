@@ -1,13 +1,10 @@
 {
-    "_id": "ObjectId('13aba')",
     "name": "starknet",
     "rpc": "https://starknet-sepolia.public.blastapi.io/rpc/v0_7",
     "delayBlock": 1,
     "explore": "string",
-    "lotteryContract": "0x0505d87681375c1719cd9f878f38994367aa336bdf0a7883f58ed9a4bfefdb26",
-    "governanceContract": "0x0480e65c64bc2a34d7243035728f946ce8ba3bf9b23fcd66835c80822d05ba80",
-    "randomnessContract": "0x022d3179dd422517bc73a4cde3fa294c719e0ca4bc676ee5627e351f48d092b3",
-    "ticketContract": "0x037dab10943020d54d8b2e41c54bd27a7a3da332625557fb12706a41479c2bca",
-    "createdAt": "2024-03-25",
-    "updatedAt": "2024-03-25"
+    "lotteryContract": "0x042b2f3842f12d16f2dbb0d0350d7d6ba82e07ceea40cdbee50e2aaeb4d1b7ac",
+    "governanceContract": "0x07228570dda14c62b91c647b5de5be54ee77ec599467bae50fe5ae4a875ba23",
+    "randomnessContract": "0x04eaf5dcaacd17a58ba369fd3ab6c428508dc9860102ac02068636b9ccba8fc1",
+    "ticketContract": "0x0382a1fc48ec15e660fff832122ed526a70083a7c539ef28a095a04eae3537cf"
 }

@@ -15,6 +15,6 @@ export const initPricerMultiplier: PriceMultipliers[] = [
   },
   {
     counterMatched: 5,
-    multiplier: 2000,
+    multiplier: 1000,
   },
 ];
