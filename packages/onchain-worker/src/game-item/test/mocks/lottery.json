@@ -1,0 +1,10 @@
+{
+    "address": "0x042b2f3842f12d16f2dbb0d0350d7d6ba82e07ceea40cdbee50e2aaeb4d1b7ac",
+    "status": 0,
+    "lotteryId": 1,
+    "ticketPrice": 0.00001,
+    "startTime": 1712493770000,
+    "drawTime": 1712497370000,
+    "jackpot": 0.001,
+    "drawnNumber": [ 18, 35, 31, 37, 20, 32 ]
+}

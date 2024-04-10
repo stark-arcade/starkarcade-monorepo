@@ -9,7 +9,7 @@ export enum EventTopic {
   WITHDRAW_WINNING = '',
 }
 
-export type LotteryDetail = {
+export type LotteryOnchainDetail = {
   id: number;
   minimumPrice: number;
   state: number;
@@ -20,6 +20,16 @@ export type LotteryDetail = {
   totalValue: number;
   jackpot: number;
   jackpotWinners: number;
+};
+
+export type TicketOnchainDetail = {
+  ticketId: number;
+  lotteryAddress: string;
+  lotteryId: number;
+  pickedNumbers: number[];
+  payOut: number;
+  user: string;
+  sameCombinationCounter: number;
 };
 
 export enum EventType {

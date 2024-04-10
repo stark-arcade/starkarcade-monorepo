@@ -4,18 +4,26 @@ import {
   Provider,
   GetTransactionReceiptResponse,
   Contract,
+  num,
+  BigNumberish,
 } from 'starknet';
 import config from '@app/shared/configuration';
 import { execSync } from 'child_process';
 import { ChainDocument, Lotteries } from '@app/shared/models/schemas';
 import {
+  ABIS,
   EventTopic,
   EventType,
   LogsReturnValues,
-  LotteryDetail,
+  LotteryOnchainDetail,
+  TicketOnchainDetail,
 } from './types';
-import { decodeTicketCreated } from './decode';
-import LotteryAbi from './abi/lottery645.json';
+import {
+  decodeDrawnNumbersReturnValue,
+  decodeNewLotteryStarted,
+  decodeTicketCreated,
+  decodeWithdrawWinningReturnValue,
+} from './decode';
 import governanceAbi from './abi/governance.json';
 import { initPricerMultiplier } from './constant';
 import { formattedContractAddress } from '@app/shared/utils';
@@ -55,9 +63,13 @@ export class Web3Service {
     chain: ChainDocument,
   ): Promise<Lotteries> {
     const provider = this.getProvider(chain.rpc);
-    const lotteryContract = new Contract(LotteryAbi, lotteryAddress, provider);
+    const lotteryContract = new Contract(
+      ABIS.LotteryABI,
+      lotteryAddress,
+      provider,
+    );
 
-    const lotteryDetail: LotteryDetail =
+    const lotteryDetail: LotteryOnchainDetail =
       await lotteryContract.getLotteryById(lotteryId);
 
     const lotteryEntity: Lotteries = {
@@ -76,6 +88,39 @@ export class Web3Service {
     };
 
     return lotteryEntity;
+  }
+
+  async getTicketOnchainDetail(
+    ticketId: number,
+    chain: ChainDocument,
+  ): Promise<TicketOnchainDetail> {
+    const provider = this.getProvider(chain.rpc);
+    const ticketContract = new Contract(
+      ABIS.TicketABI,
+      chain.ticketContract,
+      provider,
+    );
+
+    const ticketDetail = await ticketContract.getTicketById(ticketId);
+    const ticketEntity: TicketOnchainDetail = {
+      ticketId: Number((ticketDetail.ticketId as bigint).toString()),
+      lotteryAddress: formattedContractAddress(
+        num.toHex(ticketDetail.lotteryAddress as BigNumberish),
+      ),
+      pickedNumbers: (ticketDetail.pickedNumbers as bigint[]).map((value) =>
+        Number(value.toString()),
+      ),
+      user: formattedContractAddress(
+        num.toHex(ticketDetail.user as BigNumberish),
+      ),
+      sameCombinationCounter: Number(
+        (ticketDetail.sameCombinationCounter as bigint).toString(),
+      ),
+      lotteryId: Number((ticketDetail.lotteryId as bigint).toString()),
+      payOut: Number((ticketDetail.payOut as bigint).toString()),
+    };
+
+    return ticketEntity;
   }
 
   getReturnValuesEvent(
@@ -106,11 +151,43 @@ export class Web3Service {
               timestamp,
             ),
           });
+        } else if (
+          event.keys.includes(EventTopic.LOTTERY_STARTED) &&
+          formattedContractAddress(event.from_address) === chain.lotteryContract
+        ) {
+          eventWithTypes.push({
+            ...txReceiptFilter,
+            eventType: EventType.StartNewLottery,
+            returnValues: decodeNewLotteryStarted(txReceiptFilter, provider),
+          });
+        } else if (
+          event.keys.includes(EventTopic.DRAWN_NUMBERS) &&
+          formattedContractAddress(event.from_address) === chain.lotteryContract
+        ) {
+          eventWithTypes.push({
+            ...txReceiptFilter,
+            eventType: EventType.DrawnNumbers,
+            returnValues: decodeDrawnNumbersReturnValue(
+              txReceiptFilter,
+              provider,
+            ),
+          });
+        } else if (
+          event.keys.includes(EventTopic.WITHDRAW_WINNING) &&
+          formattedContractAddress(event.from_address) === chain.lotteryContract
+        ) {
+          eventWithTypes.push({
+            ...txReceiptFilter,
+            eventType: EventType.WithdrawWinning,
+            returnValues: decodeWithdrawWinningReturnValue(
+              txReceiptFilter,
+              provider,
+            ),
+          });
         }
       }
-
-      return eventWithTypes;
     }
+    return eventWithTypes;
   }
 
   async invokeContractAsAdmin(

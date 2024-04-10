@@ -1,0 +1,20 @@
+[
+    {
+        "ticketId": 1,
+        "boughtTime": 1712494998000,
+        "counterRightNumbers": 0,
+        "payout": 0,
+        "pickedNumbers": [ 2, 4, 15, 16, 22, 32 ],
+        "txHash": "0x546dee18573d57cc9351054dc1d9775d9ba21ef78f199176295227c85af46a3",
+        "matchingNumbersCount": 2
+    },
+    {
+        "ticketId": 2,
+        "boughtTime": 1712494998000,
+        "counterRightNumbers": 0,
+        "payout": 0,
+        "pickedNumbers": [ 3, 4, 16, 18, 22, 32 ],
+        "txHash": "0x546dee18573d57cc9351054dc1d9775d9ba21ef78f199176295227c85af46a3",
+        "matchingNumbersCount": 2
+    }
+]

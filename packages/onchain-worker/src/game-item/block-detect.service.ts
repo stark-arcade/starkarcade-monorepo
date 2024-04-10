@@ -45,7 +45,6 @@ export class BlockDetectService extends OnchainWorker {
         status: BlockWorkerStatus.SUCCESS,
       })
       .sort({ blockNumber: -1 });
-    console.log(latestBlock);
     this.currentBlock =
       (latestBlock?.blockNumber || configuration().beginBlock - 1) + 1;
     this.provider = new RpcProvider({ nodeUrl: this.chain.rpc });

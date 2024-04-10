@@ -2,6 +2,9 @@ import { Connection, Model, connect } from 'mongoose';
 import { GameItemService } from '../game-item.service';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import {
+  BlockDocument,
+  BlockSchema,
+  Blocks,
   ChainDocument,
   ChainSchema,
   Chains,
@@ -18,6 +21,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { Provider, RpcProvider } from 'starknet';
 import chain from './mocks/chain.json';
+import lottery from './mocks/lottery.json';
+import tickets from './mocks/tickets.json';
+import { BlockDetectService } from '../block-detect.service';
 
 describe('GameItemService', () => {
   let gameService: GameItemService;
@@ -27,9 +33,11 @@ describe('GameItemService', () => {
   let ticketModel: Model<Tickets>;
   let userModel: Model<Users>;
   let chainModel: Model<Chains>;
+  let blockModel: Model<BlockDocument>;
   let web3Service: Web3Service;
   let provider: Provider;
   let chainDocument: ChainDocument;
+  let blockDetectionService: BlockDetectService;
 
   beforeAll(async () => {
     mongod = await MongoMemoryServer.create();
@@ -39,6 +47,7 @@ describe('GameItemService', () => {
     ticketModel = mongoConnection.model(Tickets.name, TicketSchema);
     userModel = mongoConnection.model(Users.name, UserSchema);
     chainModel = mongoConnection.model(Chains.name, ChainSchema);
+    blockModel = mongoConnection.model<BlockDocument>(Blocks.name, BlockSchema);
     const app: TestingModule = await Test.createTestingModule({
       providers: [
         GameItemService,
@@ -53,8 +62,18 @@ describe('GameItemService', () => {
     gameService = app.get<GameItemService>(GameItemService);
     web3Service = app.get<Web3Service>(Web3Service);
     provider = new RpcProvider({ nodeUrl: chain.rpc });
-
     chainDocument = await chainModel.create(chain);
+    await lotteryModel.create(lottery);
+    await ticketModel.insertMany(tickets);
+
+    blockDetectionService = new BlockDetectService(
+      blockModel,
+      web3Service,
+      chainDocument,
+      gameService,
+    );
+
+    await blockDetectionService.init();
   });
 
   afterAll(async () => {
@@ -88,10 +107,53 @@ describe('GameItemService', () => {
         await gameService.processEvent(event, chainDocument);
       }
 
-      const lottery = await lotteryModel.findOne();
-      const ticket = await ticketModel.findOne();
-      const user = await userModel.findOne();
-      console.log({ lottery, ticket, user });
+      // const lottery = await lotteryModel.findOne();
+      const drawnNumber = [2, 35, 31, 37, 20, 32];
+      const ticket = await ticketModel.aggregate([
+        {
+          $match: {
+            pickedNumbers: { $elemMatch: { $in: drawnNumber } },
+          },
+        },
+        {
+          $addFields: {
+            matchingNumbersCount: {
+              $size: {
+                $setIntersection: ['$pickedNumbers', drawnNumber], // Specify your array A here
+              },
+            },
+          },
+        },
+        {
+          $match: {
+            matchingNumbersCount: { $gte: 2 },
+          },
+        },
+      ]);
+      // const user = await userModel.findOne();
+      console.log(ticket);
     });
+  });
+
+  it('processNewLotteryCreated', async () => {
+    const block = await provider.getBlock(57516);
+    await blockDetectionService.processTx(
+      '0x03610b4f8b14ad00921353ef858cbc31a45bbb921fe83e390ea4c98abd7836d7',
+      block.timestamp * 1e3,
+    );
+
+    const lottery = await lotteryModel.findOne();
+    console.log({ lottery });
+  });
+
+  it('processDrawnNumbers', async () => {
+    const block = await provider.getBlock(57569);
+    await blockDetectionService.processTx(
+      '0x0257559695c155f6e243ff687a0141ff7eb2d4ad5d8c5a9e4134169fcdd314a6',
+      block.timestamp * 1e3,
+    );
+
+    const ticket = await ticketModel.find();
+    console.log(ticket);
   });
 });
