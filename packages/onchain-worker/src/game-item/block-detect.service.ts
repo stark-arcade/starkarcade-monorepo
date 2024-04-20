@@ -45,7 +45,6 @@ export class BlockDetectService extends OnchainWorker {
         status: BlockWorkerStatus.SUCCESS,
       })
       .sort({ blockNumber: -1 });
-    console.log(latestBlock);
     this.currentBlock =
       (latestBlock?.blockNumber || configuration().beginBlock - 1) + 1;
     this.provider = new RpcProvider({ nodeUrl: this.chain.rpc });
@@ -112,7 +111,7 @@ export class BlockDetectService extends OnchainWorker {
         await Promise.all(
           txs.map(async (tx) => {
             await retryUntil(
-              async () => this.processTx(tx, block.block_number),
+              async () => this.processTx(tx, block.timestamp * 1e3),
               () => true,
               maxRetry,
             );
@@ -131,7 +130,7 @@ export class BlockDetectService extends OnchainWorker {
     );
   };
 
-  async processTx(txHash: string, blockNumber: number) {
+  async processTx(txHash: string, timestamp: number) {
     const trasactionReceipt = await this.provider.getTransactionReceipt(txHash);
     if (!trasactionReceipt) {
       // throw new Error(`Can not get transaction receipt ${txHash}`);
@@ -139,8 +138,6 @@ export class BlockDetectService extends OnchainWorker {
     }
 
     //parse event
-    const timestamp =
-      (await this.provider.getBlock(blockNumber)).timestamp * 1e3;
     const eventWithType = this.web3Service.getReturnValuesEvent(
       trasactionReceipt,
       this.chain,

@@ -14,7 +14,7 @@ export class AutomationService {
     @InjectModel(Chains.name) private readonly chainModel: Model<ChainDocument>,
   ) {}
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  // @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async drawLottery() {
     const chain = await this.chainModel.findOne();
     if (chain) {

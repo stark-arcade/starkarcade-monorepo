@@ -24,6 +24,9 @@ export class Tickets extends BaseSchema {
   boughtTime: number;
 
   @Prop()
+  txHash: string;
+
+  @Prop()
   counterRightNumbers?: number;
 
   @Prop()
