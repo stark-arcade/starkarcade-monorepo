@@ -1,3 +1,2 @@
-export * as models from './models/schemas';
-export * as dtos from './models/dtos';
+export * from './models';
 export * as types from './types';
