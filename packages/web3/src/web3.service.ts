@@ -41,6 +41,16 @@ export class Web3Service {
     return block.timestamp;
   }
 
+  async getContractInstance(
+    abi: any,
+    contractAddress: string,
+    rpc: string,
+  ): Promise<Contract> {
+    const provider = this.getProvider(rpc);
+    const contractInstance = new Contract(abi, contractAddress, provider);
+    return contractInstance;
+  }
+
   async getLotteryDuration(
     rpc: string,
     lotteryAddress: string,
