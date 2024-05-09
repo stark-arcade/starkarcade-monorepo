@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import configuration from '@app/shared/configuration';
 import { AuthenModule } from './authentication/auth.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AuthenModule } from './authentication/auth.module';
     }),
 
     MongooseModule.forRoot(configuration().db_path),
+    UserModule,
     AuthenModule,
   ],
   controllers: [AppController],
