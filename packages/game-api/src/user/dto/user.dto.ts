@@ -5,7 +5,6 @@ import {
   IsHexadecimal,
   IsObject,
   IsString,
-  IsUUID,
   IsUrl,
   Length,
 } from 'class-validator';
@@ -49,9 +48,6 @@ export class UserDto {
     return String(value).toLowerCase().trim().replace('0x', '0x0');
   })
   address: string;
-
-  @IsUUID()
-  nonce: string;
 
   @ApiProperty()
   @IsObject()

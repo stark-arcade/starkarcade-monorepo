@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import configuration from '@app/shared/configuration';
 import { AuthenModule } from './authentication/auth.module';
 import { UserModule } from './user/user.module';
+import { Game2048Module } from './2048/2048.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UserModule } from './user/user.module';
     MongooseModule.forRoot(configuration().db_path),
     UserModule,
     AuthenModule,
+    Game2048Module,
   ],
   controllers: [AppController],
   providers: [AppService],

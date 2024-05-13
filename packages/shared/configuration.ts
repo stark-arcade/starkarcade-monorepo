@@ -17,4 +17,8 @@ export default () => ({
     keystore_path: String(process.env.ADMIN_KEYSTORE_PATH),
     keystore_password: String(process.env.ADMIN_KEYSTORE_PASSWORD),
   },
+  signer_wallet: {
+    address: String(process.env.SIGNER_ADDRESS),
+    private_key: String(process.env.SIGNER_PRIVATE_KEY),
+  },
 });
