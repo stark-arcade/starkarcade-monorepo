@@ -10,10 +10,9 @@ import {
 import { Server, Socket } from 'socket.io';
 import { WsAuthGuard } from '../jwt/ws-auth.guard';
 import { Game2048Service } from './2048.service';
-import configuration from '@app/shared/configuration';
 
 @UseGuards(WsAuthGuard)
-@WebSocketGateway(configuration().game_ports.game_2048, {
+@WebSocketGateway({
   cors: {
     origin: '*',
   },
@@ -45,12 +44,13 @@ export class Game2048Gateway
     console.log(
       `Message from client ${userAddress}: ${JSON.stringify(payload)}`,
     );
-    this.gameService.startNewGame(client, Number(payload));
+
+    this.gameService.startNewGame(client, Number(payload.size));
   }
 
   @SubscribeMessage('command')
   handleMove(client: Socket, payload: any) {
-    this.gameService.onCommand(client, payload);
+    this.gameService.onCommand(client, payload.direction);
   }
 
   @SubscribeMessage('cancelGame')
