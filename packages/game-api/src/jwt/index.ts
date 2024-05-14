@@ -1,3 +1,4 @@
 export * from './jwt.auth.guard';
 export * from './jwt.decorator';
 export * from './jwt.strategy';
+export * from './ws-auth.guard';

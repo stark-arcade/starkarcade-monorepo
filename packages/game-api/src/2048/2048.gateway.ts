@@ -10,9 +10,10 @@ import {
 import { Server, Socket } from 'socket.io';
 import { WsAuthGuard } from '../jwt/ws-auth.guard';
 import { Game2048Service } from './2048.service';
+import configuration from '@app/shared/configuration';
 
 @UseGuards(WsAuthGuard)
-@WebSocketGateway({
+@WebSocketGateway(configuration().game_ports.game_2048, {
   cors: {
     origin: '*',
   },
