@@ -14,8 +14,15 @@ export const deserialize = (serialized: string): number[][] => {
     .map((_, row) =>
       Array(size)
         .fill(0)
-        .map((_, column) =>
-          serializationMap.indexOf(serialized[row * size + column]),
-        ),
+        .map((_, column) => {
+          const value = serializationMap.indexOf(
+            serialized[row * size + column],
+          );
+          if (value != 0) {
+            return Math.pow(2, value);
+          }
+
+          return value;
+        }),
     );
 };

@@ -70,7 +70,7 @@ const reduceList = (list: number[]): number[] => {
   const result: number[] = [];
   for (let i = 0; i < list.length; i++) {
     if (i < list.length - 1 && list[i] === list[i + 1]) {
-      result.push(list[i] * 2);
+      result.push(list[i] + 1);
       i++;
     } else {
       result.push(list[i]);

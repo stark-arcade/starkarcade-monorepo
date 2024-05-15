@@ -1,5 +1,6 @@
 export const GRID_SIZE = 6;
-export const WINNING_VALUE = 2048;
+export const WINNING_VALUE = 8;
+export const WINNING_POWER = Math.log2(WINNING_VALUE);
 
 export const serializationMap =
   'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';

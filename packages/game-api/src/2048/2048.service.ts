@@ -2,7 +2,6 @@ import {
   Direction,
   GameEvents,
   ServerGameStatusParam,
-  WINNING_VALUE,
 } from '@app/shared/types';
 import { Injectable } from '@nestjs/common';
 import { BoardService } from './board/board.service';
@@ -68,33 +67,33 @@ export class Game2048Service {
 
   onCommand = (socket: Socket, direction: Direction) => {
     const game = this.sockets.find((s) => s.socket === socket);
-    if (game.status !== 'started') {
+    if (!game || game.status !== 'started') {
       throw new WsException('Game not started');
     }
     if (!isValidDirection(direction)) {
       throw new WsException('Wrong move');
     }
 
-    switch (game.board.move(direction, game.board.getSize())) {
-      case 'win':
-        game.isClaimable = true;
-        if (game.winningPointCount === 0) {
+    const nextMove = game.board.move(direction, game.board.getSize());
+    if (
+      nextMove.winningCounter > 0 &&
+      game.winningPointCount < nextMove.winningCounter
+    ) {
+      game.isClaimable = true;
+      for (let i = game.winningPointCount; i < nextMove.winningCounter; i++) {
+        if (i === 0) {
           game.point += 8;
         } else {
           game.point += 4;
         }
-        this.sendGamePoint(game);
-        this.sendGameStatus(game);
-        break;
-      case 'lose':
-        game.status = 'lost';
-        this.sendGameStatus(game);
-        break;
-      default:
-        game.isClaimable = true;
-        game.point += 1;
-        this.sendGamePoint(game);
-        break;
+      }
+
+      game.winningPointCount = nextMove.winningCounter;
+    }
+    this.sendGamePoint(game);
+    if (nextMove.result === 'lose') {
+      game.status = 'lost';
+      this.sendGameStatus(game);
     }
     this.sendUpdate(game);
   };
@@ -102,13 +101,13 @@ export class Game2048Service {
   startNewGame(socket: Socket, size: number) {
     let client = this.sockets.find((game) => game.socket === socket);
     if (client) {
-      client.board = new BoardService(size, WINNING_VALUE);
+      client.board = new BoardService(size);
       client.winningPointCount = 0;
       client.status = 'started';
     } else {
       client = {
         socket,
-        board: new BoardService(size, WINNING_VALUE),
+        board: new BoardService(size),
         status: 'started',
         point: 0,
         winningPointCount: 0,
