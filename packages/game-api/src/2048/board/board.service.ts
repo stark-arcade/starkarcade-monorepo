@@ -3,6 +3,7 @@ import {
   IncreaseTiles,
   MoveResult,
   Position,
+  WINNING_POWER,
 } from '@app/shared/types';
 import { emptyArray, serialize } from '@app/shared/utils';
 import { applyGravity } from './gravity';
@@ -12,10 +13,7 @@ import { WsException } from '@nestjs/websockets';
 export class BoardService {
   private grid: number[][];
   private size: number;
-  constructor(
-    private gridSize: number,
-    private winningPower: number,
-  ) {
+  constructor(private gridSize: number) {
     if (gridSize < 4 || gridSize > 8) {
       throw new WsException('Wrong game size');
     }
@@ -34,10 +32,16 @@ export class BoardService {
     }
   }
 
-  private hasWinningValue(): boolean {
-    return this.grid.some((row) =>
-      row.some((value) => value === this.winningPower),
-    );
+  private hasWinningValue(): number {
+    let winningCounter = 0;
+    for (let i = 0; i < this.grid.length; i++) {
+      for (let j = 0; j < this.grid[i].length; j++) {
+        if (this.grid[i][j] >= WINNING_POWER) {
+          winningCounter += Math.floor(this.grid[i][j] / WINNING_POWER);
+        }
+      }
+    }
+    return winningCounter;
   }
 
   private emptyPositions(): Position[] {
@@ -68,7 +72,7 @@ export class BoardService {
     return availablePositions[randomPositionIndex];
   }
 
-  private add(value = 2) {
+  private add(value = 1) {
     const position = this.getRandomFreePosition();
     if (position === null) {
       // Move is not valid
@@ -91,19 +95,20 @@ export class BoardService {
    * @public
    * @returns Returns an enum saying if it is a winning, normal or losing move
    */
-  public move(direction: Direction, size: number): MoveResult {
+  public move(
+    direction: Direction,
+    size: number,
+  ): { winningCounter: number; result: MoveResult } {
     this.changeGravity(direction);
-    if (this.hasWinningValue()) {
-      return 'win';
-    }
+    const winningCounter = this.hasWinningValue();
     const inscreaseTiles = IncreaseTiles.find((t) => t.size === size);
     for (let i = 0; i < inscreaseTiles.increaseTiles; i++) {
       this.add();
     }
     if (this.emptyPositions().length === 0 && this.hasNoValidMoves()) {
-      return 'lose';
+      return { winningCounter, result: 'lose' };
     }
-    return 'none';
+    return { winningCounter, result: 'none' };
   }
 
   public getSize(): number {
