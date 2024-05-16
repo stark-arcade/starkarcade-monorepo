@@ -54,6 +54,9 @@ export class Users extends BaseSchema {
 
   @Prop()
   roles: string[];
+
+  @Prop({ default: 0 })
+  point?: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(Users);
