@@ -5,9 +5,11 @@ import {
   OnGatewayDisconnect,
   OnGatewayInit,
   WebSocketGateway,
+  SubscribeMessage,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import configuration from '@app/shared/configuration';
+import { TetrisService } from './tetris.service';
 
 @UseGuards(WsAuthGuard)
 @WebSocketGateway(configuration().game_ports.game_tetris, {
@@ -19,6 +21,7 @@ export class TetrisGateway
   implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
 {
   private clients: Set<Socket> = new Set();
+  constructor(private readonly tetrisService: TetrisService) {}
 
   afterInit() {
     console.log(`Tetris WebSocket Gateway initialized`);
@@ -30,5 +33,10 @@ export class TetrisGateway
   handleDisconnect(client: Socket) {
     console.log(`Client disconnected to Tetris socket: ${client.id}`);
     this.clients.delete(client);
+  }
+
+  @SubscribeMessage('startNewGame')
+  handleStartGame(client: Socket) {
+    this.tetrisService.startNewGame(client);
   }
 }
