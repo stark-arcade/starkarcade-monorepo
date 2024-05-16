@@ -10,6 +10,7 @@ import {
 import { Socket } from 'socket.io';
 import configuration from '@app/shared/configuration';
 import { TetrisService } from './tetris.service';
+import { Direction } from '@app/shared/types';
 
 @UseGuards(WsAuthGuard)
 @WebSocketGateway(configuration().game_ports.game_tetris, {
@@ -38,5 +39,20 @@ export class TetrisGateway
   @SubscribeMessage('startNewGame')
   handleStartGame(client: Socket) {
     this.tetrisService.startNewGame(client);
+  }
+
+  @SubscribeMessage('command')
+  handleMove(client: Socket, payload: { direction: Direction }) {
+    this.tetrisService.command(client, payload.direction);
+  }
+
+  @SubscribeMessage('pause')
+  handlePause(client: Socket) {
+    this.tetrisService.pause(client);
+  }
+
+  @SubscribeMessage('resume')
+  handleResume(client: Socket) {
+    this.tetrisService.resume(client);
   }
 }

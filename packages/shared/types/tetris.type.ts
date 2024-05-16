@@ -14,6 +14,11 @@ export const BOARD_HEIGHT = 20;
 export const ROWPOINTS = [40, 100, 300, 1200];
 
 /**
+ * The default dropdown time for automatically droping tetrominos in milisecond.
+ */
+export const DEFAULT_DROP_TIME = 1000;
+
+/**
  * The tetrominos used in the game.
  */
 export const TETROMINOS = {

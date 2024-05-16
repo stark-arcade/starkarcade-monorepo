@@ -1,6 +1,8 @@
 import {
   BOARD,
   BOARDCELL,
+  DEFAULT_DROP_TIME,
+  Direction,
   GameEvents,
   PLAYER,
   TetrisGameStatus,
@@ -8,14 +10,14 @@ import {
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { createBoard, isColliding } from './game/helper';
-import { resetPlayer, updatePlayerPos } from './game/player';
+import { playerRotate, resetPlayer, updatePlayerPos } from './game/player';
 import { WsException } from '@nestjs/websockets';
+import { isValidDirection } from '../2048/board/direction';
 
 export type TetrisGameParam = {
   socket: Socket;
   board: BOARD;
   status: TetrisGameStatus;
-  dropTime: number;
   player: PLAYER;
   point: number;
   isClaimable: boolean;
@@ -94,13 +96,44 @@ export class TetrisService {
     this.sendBoard(client);
   };
 
+  private movePlayer = (client: TetrisGameParam, dir: number) => {
+    if (!isColliding(client.player, client.board, { x: dir, y: 0 })) {
+      client.player = updatePlayerPos(client.player, {
+        x: dir,
+        y: 0,
+        collided: false,
+      });
+
+      this.updateBoard(client);
+    }
+  };
+
+  private getCurrentDropTime = (client: TetrisGameParam): number => {
+    if (client.level === 1) {
+      return DEFAULT_DROP_TIME;
+    }
+    return DEFAULT_DROP_TIME / client.level + 200;
+  };
+
+  private setDropTime = (client: TetrisGameParam) => {
+    if (client.interval) {
+      clearInterval(client.interval);
+    }
+
+    client.interval = setInterval(
+      this.drop,
+      this.getCurrentDropTime(client),
+      client,
+    );
+  };
+
   private drop = (client: TetrisGameParam): void => {
     if (client.status !== 'started') throw new WsException('Game not started');
     // Increase level when player has cleared 10 rows
     if (client.rows > client.level * 10) {
       client.level += 1;
       // Also increase speed
-      client.dropTime = 1000 / client.level + 200;
+      this.setDropTime(client);
     }
 
     if (!isColliding(client.player, client.board, { x: 0, y: 1 })) {
@@ -127,12 +160,38 @@ export class TetrisService {
     this.updateBoard(client);
   };
 
+  command(socket: Socket, direction: Direction) {
+    const client = this.sockets.find((client) => client.socket === socket);
+    if (client.status !== 'started') {
+      throw new WsException('Game not started');
+    }
+
+    if (!isValidDirection(direction)) {
+      throw new WsException('Wrong move');
+    }
+
+    switch (direction) {
+      case 'up':
+        client.player = playerRotate(client);
+        this.updateBoard(client);
+        break;
+      case 'right':
+        this.movePlayer(client, 1);
+        break;
+      case 'down':
+        this.drop(client);
+        break;
+      case 'left':
+        this.movePlayer(client, -1);
+        break;
+    }
+  }
+
   startNewGame(socket: Socket) {
     let client = this.sockets.find((client) => client.socket === socket);
     if (client) {
       client.board = createBoard();
       client.status = 'started';
-      client.dropTime = 1000;
       client.player = resetPlayer();
       client.rows = 0;
       client.level = 1;
@@ -141,7 +200,6 @@ export class TetrisService {
         socket,
         board: createBoard(),
         status: 'started',
-        dropTime: 1000,
         player: resetPlayer(),
         point: 0,
         isClaimable: false,
@@ -156,7 +214,28 @@ export class TetrisService {
     this.sendBoard(client);
     this.sendGameStatus(client);
     this.sendGamePoint(client);
-    const intervalId = setInterval(this.drop, client.dropTime, client);
-    client.interval = intervalId;
+    this.setDropTime(client);
+  }
+
+  pause(socket: Socket) {
+    const client = this.sockets.find((client) => client.socket === socket);
+    if (client.status !== 'started') {
+      throw new WsException('Game not started or paused');
+    }
+
+    client.status = 'paused';
+    clearInterval(client.interval);
+    this.sendGameStatus(client);
+  }
+
+  resume(socket: Socket) {
+    const client = this.sockets.find((client) => client.socket === socket);
+    if (client.status !== 'paused') {
+      throw new WsException('Game not paused');
+    }
+
+    client.status = 'started';
+    this.setDropTime(client);
+    this.sendGameStatus(client);
   }
 }
