@@ -46,6 +46,12 @@ export class Users extends BaseSchema {
   @Prop({ default: false })
   isVerified?: boolean;
 
+  @Prop({ default: false })
+  isCreatorPayer?: boolean;
+
+  @Prop({ type: SchemaTypes.ObjectId, ref: 'Users' })
+  mappingAddress?: UserDocument;
+
   @Prop()
   roles: string[];
 
