@@ -67,6 +67,10 @@ export class Game2048Service {
 
   onCommand = (socket: Socket, direction: Direction) => {
     const game = this.sockets.find((s) => s.socket === socket);
+    if (!game) {
+      throw new WsException('Game not exists');
+    }
+
     if (!game || game.status !== 'started') {
       throw new WsException('Game not started');
     }
@@ -124,6 +128,10 @@ export class Game2048Service {
 
   async claimPoint(socket: Socket, userAddress: string) {
     const client = this.sockets.find((game) => game.socket === socket);
+
+    if (!client) {
+      throw new WsException('Client not exists');
+    }
 
     if (!client.isClaimable) {
       throw new WsException('Do not have any permission to claim point');
