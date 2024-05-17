@@ -142,6 +142,7 @@ export class Game2048Service {
       userAddress,
       client.point,
       timestamp,
+      ChainDocument.name,
     );
 
     client.isClaimable = false;

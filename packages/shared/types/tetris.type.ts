@@ -95,3 +95,10 @@ export type BOARDCELL = [string | number, string];
 export type BOARD = BOARDCELL[][];
 
 export type TetrisGameStatus = 'started' | 'lost' | 'paused';
+
+export type PointParam = {
+  userAddress: string;
+  point: number;
+  timestamp: number;
+  proof: string[];
+};

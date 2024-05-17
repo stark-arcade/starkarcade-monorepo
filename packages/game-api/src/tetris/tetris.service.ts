@@ -5,6 +5,7 @@ import {
   Direction,
   GameEvents,
   PLAYER,
+  PointParam,
   TetrisGameStatus,
 } from '@app/shared/types';
 import { Injectable } from '@nestjs/common';
@@ -13,6 +14,13 @@ import { createBoard, isColliding } from './game/helper';
 import { playerRotate, resetPlayer, updatePlayerPos } from './game/player';
 import { WsException } from '@nestjs/websockets';
 import { isValidDirection } from '../2048/board/direction';
+import { InjectModel } from '@nestjs/mongoose';
+import { ChainDocument, Chains } from '@app/shared/models/schemas';
+import { Model } from 'mongoose';
+import { Web3Service } from '@app/web3/web3.service';
+import { Account, stark } from 'starknet';
+import configuration from '@app/shared/configuration';
+import { getClaimPointMessage } from '@app/shared/utils';
 
 export type TetrisGameParam = {
   socket: Socket;
@@ -22,6 +30,7 @@ export type TetrisGameParam = {
   point: number;
   isClaimable: boolean;
   level: number;
+  pointerLevel: number;
   rows: number;
   interval: any;
 };
@@ -29,6 +38,11 @@ export type TetrisGameParam = {
 @Injectable()
 export class TetrisService {
   private sockets: TetrisGameParam[] = [];
+  constructor(
+    @InjectModel(Chains.name)
+    private readonly chainModel: Model<ChainDocument>,
+    private readonly web3Service: Web3Service,
+  ) {}
 
   private sendBoard(client: TetrisGameParam) {
     client.socket.emit(GameEvents.BOARD_UPDATED_EVENT, client.board);
@@ -127,13 +141,37 @@ export class TetrisService {
     );
   };
 
+  private addPoint(client: TetrisGameParam) {
+    const targetLevel = Math.floor(client.level / 5);
+    if (targetLevel < 1 || client.pointerLevel >= targetLevel) return;
+
+    if (targetLevel === 1) {
+      client.point += 1;
+    } else if (targetLevel === 2) {
+      client.point += 2;
+    } else if (targetLevel === 3) {
+      client.point += 4;
+    } else if (targetLevel >= 4) {
+      client.point += 8;
+    }
+
+    client.pointerLevel = targetLevel;
+    client.isClaimable = true;
+    this.sendGamePoint(client);
+  }
+
+  private sendClaimPoint(client: TetrisGameParam, param: PointParam) {
+    client.socket.emit(GameEvents.CLAIM_POINT_EVENT, param);
+  }
+
   private drop = (client: TetrisGameParam): void => {
     if (client.status !== 'started') throw new WsException('Game not started');
     // Increase level when player has cleared 10 rows
-    if (client.rows > client.level * 10) {
+    if (client.rows >= client.level * 10) {
       client.level += 1;
       // Also increase speed
       this.setDropTime(client);
+      this.addPoint(client);
     }
 
     if (!isColliding(client.player, client.board, { x: 0, y: 1 })) {
@@ -162,6 +200,10 @@ export class TetrisService {
 
   command(socket: Socket, direction: Direction) {
     const client = this.sockets.find((client) => client.socket === socket);
+    if (!client) {
+      throw new WsException('Client not exists');
+    }
+
     if (client.status !== 'started') {
       throw new WsException('Game not started');
     }
@@ -195,6 +237,7 @@ export class TetrisService {
       client.player = resetPlayer();
       client.rows = 0;
       client.level = 1;
+      client.pointerLevel = 0;
     } else {
       client = {
         socket,
@@ -204,6 +247,7 @@ export class TetrisService {
         point: 0,
         isClaimable: false,
         level: 1,
+        pointerLevel: 0,
         rows: 0,
         interval: null,
       };
@@ -219,6 +263,9 @@ export class TetrisService {
 
   pause(socket: Socket) {
     const client = this.sockets.find((client) => client.socket === socket);
+    if (!client) {
+      throw new WsException('Client not exists');
+    }
     if (client.status !== 'started') {
       throw new WsException('Game not started or paused');
     }
@@ -230,6 +277,9 @@ export class TetrisService {
 
   resume(socket: Socket) {
     const client = this.sockets.find((client) => client.socket === socket);
+    if (!client) {
+      throw new WsException('Client not exists');
+    }
     if (client.status !== 'paused') {
       throw new WsException('Game not paused');
     }
@@ -237,5 +287,51 @@ export class TetrisService {
     client.status = 'started';
     this.setDropTime(client);
     this.sendGameStatus(client);
+  }
+
+  async claimPoint(socket: Socket) {
+    const client = this.sockets.find((client) => client.socket === socket);
+    if (!client) {
+      throw new WsException('Client not exists');
+    }
+
+    if (!client.isClaimable) {
+      throw new WsException('Do not have any permission to claim point');
+    }
+
+    const chainDocument = await this.chainModel.findOne();
+    const provider = this.web3Service.getProvider(chainDocument.rpc);
+    const signerAccount = new Account(
+      provider,
+      configuration().signer_wallet.address,
+      configuration().signer_wallet.private_key,
+    );
+
+    const userAddress = (socket.handshake as any).user.sub;
+    const timestamp = new Date().getTime();
+    const claimPointMessage = getClaimPointMessage(
+      userAddress,
+      client.point,
+      timestamp,
+      chainDocument.name,
+    );
+
+    client.isClaimable = false;
+    client.point = 0;
+
+    const proof = await signerAccount.signMessage(claimPointMessage);
+    const formattedProof = stark.formatSignature(proof);
+    const pointData: PointParam = {
+      userAddress,
+      point: client.point,
+      timestamp,
+      proof: formattedProof,
+    };
+    this.sendClaimPoint(client, pointData);
+    this.sendGamePoint(client);
+  }
+
+  disconnectGame(socket: Socket) {
+    this.sockets = this.sockets.filter((sk) => sk.socket !== socket);
   }
 }

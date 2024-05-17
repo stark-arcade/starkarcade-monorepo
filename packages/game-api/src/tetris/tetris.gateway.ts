@@ -33,6 +33,7 @@ export class TetrisGateway
   }
   handleDisconnect(client: Socket) {
     console.log(`Client disconnected to Tetris socket: ${client.id}`);
+    this.tetrisService.disconnectGame(client);
     this.clients.delete(client);
   }
 
@@ -54,5 +55,10 @@ export class TetrisGateway
   @SubscribeMessage('resume')
   handleResume(client: Socket) {
     this.tetrisService.resume(client);
+  }
+
+  @SubscribeMessage('claimPoint')
+  async handleClaimPoint(client: Socket) {
+    await this.tetrisService.claimPoint(client);
   }
 }
