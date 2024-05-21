@@ -4,6 +4,7 @@ export const getClaimPointMessage = (
   userAddress: string,
   point: number,
   timestamp: number,
+  chainName: string,
 ) => {
   const typedMessage = {
     types: {
@@ -40,7 +41,7 @@ export const getClaimPointMessage = (
     domain: {
       name: 'poolpoint',
       version: '1',
-      chainId: shortString.encodeShortString('SN_SEPOLIA'),
+      chainId: shortString.encodeShortString(chainName),
     },
     message: {
       address: userAddress,

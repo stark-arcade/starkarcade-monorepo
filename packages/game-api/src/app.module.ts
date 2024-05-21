@@ -7,6 +7,7 @@ import configuration from '@app/shared/configuration';
 import { AuthenModule } from './authentication/auth.module';
 import { UserModule } from './user/user.module';
 import { Game2048Module } from './2048/2048.module';
+import { TetrisModule } from './tetris/tetris.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { Game2048Module } from './2048/2048.module';
     UserModule,
     AuthenModule,
     Game2048Module,
+    TetrisModule,
   ],
   controllers: [AppController],
   providers: [AppService],
