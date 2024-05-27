@@ -108,6 +108,7 @@ export class TetrisService {
     }
 
     this.sendBoard(client);
+    return true;
   };
 
   private movePlayer = (client: TetrisGameParam, dir: number) => {
@@ -118,8 +119,9 @@ export class TetrisService {
         collided: false,
       });
 
-      this.updateBoard(client);
+      return this.updateBoard(client);
     }
+    return;
   };
 
   private getCurrentDropTime = (client: TetrisGameParam): number => {
@@ -186,6 +188,7 @@ export class TetrisService {
         client.status = 'lost';
         clearInterval(client.interval);
         this.sendGameStatus(client);
+        return;
       }
 
       client.player = updatePlayerPos(client.player, {
@@ -196,6 +199,7 @@ export class TetrisService {
     }
 
     this.updateBoard(client);
+    return;
   };
 
   command(socket: Socket, direction: Direction) {
@@ -214,8 +218,11 @@ export class TetrisService {
 
     switch (direction) {
       case 'up':
-        client.player = playerRotate(client);
-        this.updateBoard(client);
+        const newPlayer = playerRotate(client);
+        if (newPlayer !== client.player) {
+          client.player = newPlayer;
+          this.updateBoard(client);
+        }
         break;
       case 'right':
         this.movePlayer(client, 1);
@@ -254,7 +261,6 @@ export class TetrisService {
 
       this.sockets.push(client);
     }
-
     this.sendBoard(client);
     this.sendGameStatus(client);
     this.sendGamePoint(client);
