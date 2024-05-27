@@ -33,6 +33,11 @@ export enum GameEvents {
 
   // This event is fired by the server socket when user claim point
   CLAIM_POINT_EVENT = 'claim-point',
+
+  // this event is fired by the server socket when user complete rows on tetris game
+  GAME_ROW = 'game-row',
+
+  GAME_LEVEL = 'game-level',
 }
 
 export const IncreaseTiles = [
