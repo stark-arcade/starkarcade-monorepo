@@ -59,6 +59,14 @@ export class TetrisService {
     });
   }
 
+  private sendGameRows(client: TetrisGameParam) {
+    client.socket.emit(GameEvents.GAME_ROW, client.rows);
+  }
+
+  private sendGameLevel(client: TetrisGameParam) {
+    client.socket.emit(GameEvents.GAME_LEVEL, client.level);
+  }
+
   private sweepRows = (client: TetrisGameParam, newBoard: BOARD): BOARD => {
     return newBoard.reduce((ack, row) => {
       // If we don't find a 0 it means that the row is full and should be cleared
@@ -69,6 +77,7 @@ export class TetrisService {
         ack.unshift(
           new Array(newBoard[0].length).fill([0, 'clear']) as BOARDCELL[],
         );
+        this.sendGameRows(client);
         return ack;
       }
 
@@ -108,6 +117,7 @@ export class TetrisService {
     }
 
     this.sendBoard(client);
+    return true;
   };
 
   private movePlayer = (client: TetrisGameParam, dir: number) => {
@@ -118,8 +128,9 @@ export class TetrisService {
         collided: false,
       });
 
-      this.updateBoard(client);
+      return this.updateBoard(client);
     }
+    return;
   };
 
   private getCurrentDropTime = (client: TetrisGameParam): number => {
@@ -172,6 +183,7 @@ export class TetrisService {
       // Also increase speed
       this.setDropTime(client);
       this.addPoint(client);
+      this.sendGameLevel(client);
     }
 
     if (!isColliding(client.player, client.board, { x: 0, y: 1 })) {
@@ -186,6 +198,7 @@ export class TetrisService {
         client.status = 'lost';
         clearInterval(client.interval);
         this.sendGameStatus(client);
+        return;
       }
 
       client.player = updatePlayerPos(client.player, {
@@ -196,6 +209,7 @@ export class TetrisService {
     }
 
     this.updateBoard(client);
+    return;
   };
 
   command(socket: Socket, direction: Direction) {
@@ -214,8 +228,11 @@ export class TetrisService {
 
     switch (direction) {
       case 'up':
-        client.player = playerRotate(client);
-        this.updateBoard(client);
+        const newPlayer = playerRotate(client);
+        if (newPlayer !== client.player) {
+          client.player = newPlayer;
+          this.updateBoard(client);
+        }
         break;
       case 'right':
         this.movePlayer(client, 1);
@@ -254,11 +271,12 @@ export class TetrisService {
 
       this.sockets.push(client);
     }
-
     this.sendBoard(client);
     this.sendGameStatus(client);
     this.sendGamePoint(client);
     this.setDropTime(client);
+    this.sendGameRows(client);
+    this.sendGameLevel(client);
   }
 
   pause(socket: Socket) {
@@ -316,9 +334,6 @@ export class TetrisService {
       chainDocument.name,
     );
 
-    client.isClaimable = false;
-    client.point = 0;
-
     const proof = await signerAccount.signMessage(claimPointMessage);
     const formattedProof = stark.formatSignature(proof);
     const pointData: PointParam = {
@@ -327,6 +342,9 @@ export class TetrisService {
       timestamp,
       proof: formattedProof,
     };
+
+    client.isClaimable = false;
+    client.point = 0;
     this.sendClaimPoint(client, pointData);
     this.sendGamePoint(client);
   }

@@ -153,9 +153,6 @@ export class Game2048Service {
       ChainDocument.name,
     );
 
-    client.isClaimable = false;
-    client.point = 0;
-
     const proof = await signerAccount.signMessage(claimPointMessage);
     const formattedProof = stark.formatSignature(proof);
     const pointData: PointParam = {
@@ -164,6 +161,9 @@ export class Game2048Service {
       timestamp,
       proof: formattedProof,
     };
+
+    client.isClaimable = false;
+    client.point = 0;
     this.sendClaimPoint(client, pointData);
     this.sendGamePoint(client);
   }
