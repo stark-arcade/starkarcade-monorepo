@@ -153,16 +153,16 @@ export class TetrisService {
   };
 
   private addPoint(client: TetrisGameParam) {
-    const targetLevel = Math.floor(client.level / 5);
-    if (targetLevel < 1 || client.pointerLevel >= targetLevel) return;
+    const targetLevel = Math.round(client.level / 2);
+    if (targetLevel <= 1 || client.pointerLevel >= targetLevel) return;
 
-    if (targetLevel === 1) {
+    if (targetLevel === 2) {
       client.point += 1;
-    } else if (targetLevel === 2) {
-      client.point += 2;
     } else if (targetLevel === 3) {
+      client.point += 2;
+    } else if (targetLevel === 4) {
       client.point += 4;
-    } else if (targetLevel >= 4) {
+    } else if (targetLevel >= 5) {
       client.point += 8;
     }
 
