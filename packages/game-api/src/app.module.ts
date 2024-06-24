@@ -8,6 +8,7 @@ import { AuthenModule } from './authentication/auth.module';
 import { UserModule } from './user/user.module';
 import { Game2048Module } from './2048/2048.module';
 import { TetrisModule } from './tetris/tetris.module';
+import { StarkFlipModule } from './starkflip/starkflip.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { TetrisModule } from './tetris/tetris.module';
     AuthenModule,
     Game2048Module,
     TetrisModule,
+    StarkFlipModule,
   ],
   controllers: [AppController],
   providers: [AppService],

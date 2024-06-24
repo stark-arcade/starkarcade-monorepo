@@ -29,6 +29,15 @@ export class Chains extends BaseSchema {
 
   @Prop()
   ticketContract: string;
+
+  @Prop()
+  PoolPointContract: string;
+
+  @Prop()
+  starkFlipContract: string;
+
+  @Prop()
+  starkFlipPool: string;
 }
 
 export const ChainSchema = SchemaFactory.createForClass(Chains);
