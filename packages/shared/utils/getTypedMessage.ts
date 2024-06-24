@@ -52,3 +52,53 @@ export const getClaimPointMessage = (
 
   return typedMessage;
 };
+
+export const getSettleMessage = (
+  gameId: string,
+  guess: number,
+  seed: string,
+) => {
+  return {
+    types: {
+      StarkNetDomain: [
+        {
+          name: 'name',
+          type: 'felt',
+        },
+        {
+          name: 'version',
+          type: 'felt',
+        },
+        {
+          name: 'chainId',
+          type: 'felt',
+        },
+      ],
+      Settle: [
+        {
+          name: 'game_id',
+          type: 'felt',
+        },
+        {
+          name: 'guess',
+          type: 'u8',
+        },
+        {
+          name: 'seed',
+          type: 'u128',
+        },
+      ],
+    },
+    primaryType: 'Settle',
+    domain: {
+      name: 'StarkFlip',
+      version: '1',
+      chainId: shortString.encodeShortString('SN_MAIN'),
+    },
+    message: {
+      game_id: gameId,
+      guess,
+      seed,
+    },
+  };
+};
