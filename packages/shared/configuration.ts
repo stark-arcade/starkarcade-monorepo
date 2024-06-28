@@ -11,6 +11,7 @@ export default () => ({
     game_2048: Number(process.env.PORT_2048) || 5002,
     game_tetris: Number(process.env.PORT_TETRIS) || 5003,
     stark_flip: Number(process.env.PORT_STARKFLIP) || 5004,
+    stark_sweep: Number(process.env.PORT_STARKSWEEP) || 5005,
   },
   beginBlock: Number(process.env.BEGIN_BLOCK) || 0,
   jwt: {
