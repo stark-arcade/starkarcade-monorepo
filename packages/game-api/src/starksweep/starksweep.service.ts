@@ -16,12 +16,12 @@ import configuration from '@app/shared/configuration';
 export type StarkSweepParam = {
   socket: Socket;
   deltaTime: number;
-  mainBrush: { x: string; y: string };
-  otherBrush: { x: string; y: string };
+  mainBrush: { x: number; y: number };
+  otherBrush: { x: number; y: number };
   currentTime: number;
   rotateSpeed: number;
-  radius: string;
-  platformOffset: { x: string; y: string };
+  radius: number;
+  platformOffset: { x: number; y: number };
   currentPoint: number;
   previousPoint: number;
   level: number; // mỗi level có 5 stage nên mỗi lần thay đổi level là người chơi đã chơi 5 màn
@@ -75,7 +75,7 @@ export class StarkSweepService {
 
   private check_true(
     client: StarkSweepParam,
-    position: { x: string; y: string },
+    position: { x: number; y: number },
   ) {
     let distance = distance_between_two_point(
       position.x,
@@ -83,7 +83,7 @@ export class StarkSweepService {
       client.mainBrush.x,
       client.mainBrush.y,
     );
-    return distance < parseFloat(client.radius) + 1;
+    return distance < client.radius + 1;
   }
 
   private async sign_transaction(client: StarkSweepParam, address: string) {
@@ -116,12 +116,12 @@ export class StarkSweepService {
     this.sockets.push({
       socket,
       deltaTime: 0,
-      mainBrush: { x: '0', y: '0' },
-      otherBrush: { x: '0', y: '0' },
+      mainBrush: { x: 0, y: 0 },
+      otherBrush: { x: 0, y: 0 },
       currentTime: 0,
       rotateSpeed: 0.2,
-      radius: '4',
-      platformOffset: { x: '0', y: '0' },
+      radius: 4,
+      platformOffset: { x: 0, y: 0 },
       currentPoint: 0,
       previousPoint: 0,
       level: 0,
@@ -165,8 +165,8 @@ export class StarkSweepService {
   ) {
     const client = this.sockets.find((i) => i.socket == socket);
 
-    client.mainBrush = { x: x1, y: y1 };
-    client.otherBrush = { x: x2, y: y2 };
+    client.mainBrush = { x: parseFloat(x1), y: parseFloat(y1) };
+    client.otherBrush = { x: parseFloat(x2), y: parseFloat(y2) };
   }
 
   handlePlayerTouch(socket: Socket) {
@@ -182,7 +182,10 @@ export class StarkSweepService {
   ) {
     const client = this.sockets.find((i) => i.socket == socket);
 
-    client.platformOffset = { x: positionX, y: positionY };
+    client.platformOffset = {
+      x: parseFloat(positionX),
+      y: parseFloat(positionY),
+    };
   }
 
   handleUpdateLevel(socket: Socket, level: number) {
@@ -203,7 +206,10 @@ export class StarkSweepService {
 
     if (
       client.isCoinCollected == false &&
-      this.check_true(client, { x: positionX, y: positionY })
+      this.check_true(client, {
+        x: parseFloat(positionX),
+        y: parseFloat(positionY),
+      })
     ) {
       client.isCoinCollected = true;
       client.collectedCoin++;

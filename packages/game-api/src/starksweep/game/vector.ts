@@ -1,23 +1,23 @@
 export function add_two_vectors(
-  x1: string,
-  y1: string,
-  x2: string,
-  y2: string,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
 ) {
   return {
-    x: (parseFloat(x1) + parseFloat(x2)).toString(),
-    y: (parseFloat(y1) + parseFloat(y2)).toString(),
+    x: x1 + x2,
+    y: y1 + y2,
   };
 }
 
 export function subtract_two_vectors(
-  x1: string,
-  y1: string,
-  x2: string,
-  y2: string,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
 ) {
   return {
-    x: (parseFloat(x1) - parseFloat(x2)).toString(),
-    y: (parseFloat(y1) - parseFloat(y2)).toString(),
+    x: x1 - x2,
+    y: y1 - y2,
   };
 }
