@@ -29,8 +29,8 @@ export function rotatePointWithRadius(
   let rotatedY = scaledX * Math.sin(realAngle) + scaledY * Math.cos(realAngle);
 
   // Translate the point back
-  let finalX = rotatedX + cx;
-  let finalY = rotatedY + cy;
+  let finalX: number = rotatedX + cx;
+  let finalY: number = rotatedY + cy;
 
   return { x: finalX, y: finalY };
 }

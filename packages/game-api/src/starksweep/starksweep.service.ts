@@ -158,21 +158,34 @@ export class StarkSweepService {
 
   handleSetBrushPosition(
     socket: Socket,
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
+    x1: string,
+    y1: string,
+    x2: string,
+    y2: string,
   ) {
     const client = this.sockets.find((i) => i.socket == socket);
 
-    client.mainBrush = { x: x1, y: y1 };
-    client.otherBrush = { x: x2, y: y2 };
+    client.mainBrush = { x: parseFloat(x1), y: parseFloat(y1) };
+    client.otherBrush = { x: parseFloat(x2), y: parseFloat(y2) };
   }
 
   handlePlayerTouch(socket: Socket) {
     const client = this.sockets.find((i) => i.socket == socket);
 
     this.playerTouch(client);
+  }
+
+  handleUpdatePlatformPosition(
+    socket: Socket,
+    positionX: string,
+    positionY: string,
+  ) {
+    const client = this.sockets.find((i) => i.socket == socket);
+
+    client.platformOffset = {
+      x: parseFloat(positionX),
+      y: parseFloat(positionY),
+    };
   }
 
   handleUpdateLevel(socket: Socket, level: number) {
@@ -188,12 +201,15 @@ export class StarkSweepService {
     client.socket.emit('spawnCoin', (!client.isCoinCollected).toString());
   }
 
-  handleCoinCollect(socket: Socket, positionX: number, positionY: number) {
+  handleCoinCollect(socket: Socket, positionX: string, positionY: string) {
     const client = this.sockets.find((i) => i.socket == socket);
 
     if (
       client.isCoinCollected == false &&
-      this.check_true(client, { x: positionX, y: positionY })
+      this.check_true(client, {
+        x: parseFloat(positionX),
+        y: parseFloat(positionY),
+      })
     ) {
       client.isCoinCollected = true;
       client.collectedCoin++;
