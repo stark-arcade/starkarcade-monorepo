@@ -1,14 +1,14 @@
 export function rotatePointWithRadius(
-  px: number,
-  py: number,
-  cx: number,
-  cy: number,
+  px: string,
+  py: string,
+  cx: string,
+  cy: string,
   angle: number,
-  radius: number,
+  radius: string,
   direction: number,
 ) {
-  let translatedX = px - cx;
-  let translatedY = py - cy;
+  let translatedX = parseFloat(px) - parseFloat(cx);
+  let translatedY = parseFloat(py) - parseFloat(cy);
 
   // Calculate the original distance from the center
   let originalDistance = Math.sqrt(
@@ -20,8 +20,8 @@ export function rotatePointWithRadius(
   let unitY = translatedY / originalDistance;
 
   // Scale the unit vector by the new radius
-  let scaledX = unitX * radius;
-  let scaledY = unitY * radius;
+  let scaledX = unitX * parseFloat(radius);
+  let scaledY = unitY * parseFloat(radius);
 
   // Apply the rotation
   let realAngle = angle * direction;
@@ -29,17 +29,20 @@ export function rotatePointWithRadius(
   let rotatedY = scaledX * Math.sin(realAngle) + scaledY * Math.cos(realAngle);
 
   // Translate the point back
-  let finalX = rotatedX + cx;
-  let finalY = rotatedY + cy;
+  let finalX: number = rotatedX + parseFloat(cx);
+  let finalY: number = rotatedY + parseFloat(cy);
 
-  return { x: finalX, y: finalY };
+  return { x: finalX.toString(), y: finalY.toString() };
 }
 
 export function distance_between_two_point(
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number,
+  x1: string,
+  y1: string,
+  x2: string,
+  y2: string,
 ) {
-  return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+  return Math.sqrt(
+    Math.pow(parseFloat(x2) - parseFloat(x1), 2) +
+      Math.pow(parseFloat(y2) - parseFloat(y1), 2),
+  );
 }

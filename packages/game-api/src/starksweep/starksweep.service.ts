@@ -16,12 +16,12 @@ import configuration from '@app/shared/configuration';
 export type StarkSweepParam = {
   socket: Socket;
   deltaTime: number;
-  mainBrush: { x: number; y: number };
-  otherBrush: { x: number; y: number };
+  mainBrush: { x: string; y: string };
+  otherBrush: { x: string; y: string };
   currentTime: number;
   rotateSpeed: number;
-  radius: number;
-  platformOffset: { x: number; y: number };
+  radius: string;
+  platformOffset: { x: string; y: string };
   currentPoint: number;
   previousPoint: number;
   level: number; // mỗi level có 5 stage nên mỗi lần thay đổi level là người chơi đã chơi 5 màn
@@ -75,7 +75,7 @@ export class StarkSweepService {
 
   private check_true(
     client: StarkSweepParam,
-    position: { x: number; y: number },
+    position: { x: string; y: string },
   ) {
     let distance = distance_between_two_point(
       position.x,
@@ -83,7 +83,7 @@ export class StarkSweepService {
       client.mainBrush.x,
       client.mainBrush.y,
     );
-    return distance < client.radius + 1;
+    return distance < parseFloat(client.radius) + 1;
   }
 
   private async sign_transaction(client: StarkSweepParam, address: string) {
@@ -116,12 +116,12 @@ export class StarkSweepService {
     this.sockets.push({
       socket,
       deltaTime: 0,
-      mainBrush: { x: 0, y: 0 },
-      otherBrush: { x: 0, y: 0 },
+      mainBrush: { x: '0', y: '0' },
+      otherBrush: { x: '0', y: '0' },
       currentTime: 0,
       rotateSpeed: 0.2,
-      radius: 4,
-      platformOffset: { x: 0, y: 0 },
+      radius: '4',
+      platformOffset: { x: '0', y: '0' },
       currentPoint: 0,
       previousPoint: 0,
       level: 0,
@@ -158,10 +158,10 @@ export class StarkSweepService {
 
   handleSetBrushPosition(
     socket: Socket,
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
+    x1: string,
+    y1: string,
+    x2: string,
+    y2: string,
   ) {
     const client = this.sockets.find((i) => i.socket == socket);
 
@@ -173,6 +173,16 @@ export class StarkSweepService {
     const client = this.sockets.find((i) => i.socket == socket);
 
     this.playerTouch(client);
+  }
+
+  handleUpdatePlatformPosition(
+    socket: Socket,
+    positionX: string,
+    positionY: string,
+  ) {
+    const client = this.sockets.find((i) => i.socket == socket);
+
+    client.platformOffset = { x: positionX, y: positionY };
   }
 
   handleUpdateLevel(socket: Socket, level: number) {
@@ -188,7 +198,7 @@ export class StarkSweepService {
     client.socket.emit('spawnCoin', (!client.isCoinCollected).toString());
   }
 
-  handleCoinCollect(socket: Socket, positionX: number, positionY: number) {
+  handleCoinCollect(socket: Socket, positionX: string, positionY: string) {
     const client = this.sockets.find((i) => i.socket == socket);
 
     if (

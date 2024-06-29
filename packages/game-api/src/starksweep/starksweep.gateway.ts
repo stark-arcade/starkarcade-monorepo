@@ -40,10 +40,10 @@ export class StarkSweepGateway
   @SubscribeMessage('setBrushPosition')
   handleSetBrushPosition(
     client: Socket,
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
+    x1: string,
+    y1: string,
+    x2: string,
+    y2: string,
   ) {
     this.starkSweepService.handleSetBrushPosition(client, x1, x2, y1, y2);
   }
@@ -53,18 +53,31 @@ export class StarkSweepGateway
     this.starkSweepService.handlePlayerTouch(client);
   }
 
+  @SubscribeMessage('updatePlatformPosition')
+  handleUpdatePlatformPosition(
+    client: Socket,
+    positionX: string,
+    positionY: string,
+  ) {
+    this.starkSweepService.handleUpdatePlatformPosition(
+      client,
+      positionX,
+      positionY,
+    );
+  }
+
   @SubscribeMessage('updateLevel')
   handleUpdateLevel(client: Socket, level: number) {
-    this.handleUpdateLevel(client, level);
+    this.starkSweepService.handleUpdateLevel(client, level);
   }
 
   @SubscribeMessage('coinCollect')
-  handleCoinCollect(client: Socket, positionX: number, positionY: number) {
-    this.handleCoinCollect(client, positionX, positionY);
+  handleCoinCollect(client: Socket, positionX: string, positionY: string) {
+    this.starkSweepService.handleCoinCollect(client, positionX, positionY);
   }
 
   @SubscribeMessage('claim')
   handleClaim(client: Socket, address: string) {
-    this.handleClaim(client, address);
+    this.starkSweepService.handleClaim(client, address);
   }
 }
