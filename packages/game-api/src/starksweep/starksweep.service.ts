@@ -44,13 +44,13 @@ export class StarkSweepService {
   }
 
   private updateCalculate(client: StarkSweepParam) {
-    this.rotateBrush(client);
     client.mainBrush = add_two_vectors(
       client.mainBrush.x,
       client.mainBrush.y,
       client.platformOffset.x,
       client.platformOffset.y,
     );
+    this.rotateBrush(client);
   }
 
   private rotateBrush(client: StarkSweepParam) {
@@ -147,11 +147,14 @@ export class StarkSweepService {
 
     client.deltaTime = (new Date().getTime() - client.currentTime) * 0.01;
     this.updateCalculate(client);
+    // console.log(client.mainBrush.x + " " + client.mainBrush.y + " " + client.otherBrush.x + " " + client.otherBrush.y);
+
     let stringData = JSON.stringify({
       mainBrush: client.mainBrush,
       otherBrush: client.otherBrush,
     });
 
+    // console.log(stringData);
     client.socket.emit('updateBrushPosition', stringData);
     client.currentTime = new Date().getTime();
   }
@@ -165,6 +168,7 @@ export class StarkSweepService {
   ) {
     const client = this.sockets.find((i) => i.socket == socket);
 
+    // console.log("Set Brush position " + x1 + " " + y1 + " " + x2 + " " + y2);
     client.mainBrush = { x: parseFloat(x1), y: parseFloat(y1) };
     client.otherBrush = { x: parseFloat(x2), y: parseFloat(y2) };
   }
@@ -223,5 +227,12 @@ export class StarkSweepService {
 
     const proof = await this.sign_transaction(client, address);
     client.socket.emit('updateProof', JSON.stringify(proof));
+  }
+
+  async handleAfterClaim(socket: Socket) {
+    const client = this.sockets.find((i) => i.socket == socket);
+
+    client.collectedCoin = 0;
+    client.socket.emit('updateCoin', client.collectedCoin.toString());
   }
 }
