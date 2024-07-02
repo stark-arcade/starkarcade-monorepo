@@ -6,6 +6,7 @@ config({ path: '../../.env' });
 export default () => ({
   db_path: String(process.env.DB_PATH),
   onchain_worker_port: Number(process.env.ONCHAIN_WORKER_PORT) || 3001,
+  onchain_queue_port: Number(process.env.ONCHAIN_QUEUE_PORT) || 3002,
   api_port: Number(process.env.API_PORT) || 5001,
   game_ports: {
     game_2048: Number(process.env.PORT_2048) || 5002,

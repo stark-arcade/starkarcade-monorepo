@@ -19,8 +19,10 @@ import {
   TicketOnchainDetail,
 } from './types';
 import {
+  decodeCreateGame,
   decodeDrawnNumbersReturnValue,
   decodeNewLotteryStarted,
+  decodeSettleGame,
   decodeTicketCreated,
   decodeWithdrawWinningReturnValue,
 } from './decode';
@@ -147,54 +149,89 @@ export class Web3Service {
           ...txReceipt,
           events: txReceipt.events.filter((ev) => ev == event),
         };
-
         if (
-          event.keys.includes(EventTopic.TICKET_CREATED) &&
-          formattedContractAddress(event.from_address) === chain.ticketContract
+          event.keys.includes(EventTopic.CREATE_GAME) &&
+          formattedContractAddress(event.from_address) ===
+            chain.starkFlipContract
         ) {
-          eventWithTypes.push({
-            ...txReceiptFilter,
-            eventType: EventType.TicketCreated,
-            returnValues: decodeTicketCreated(
-              txReceiptFilter,
-              provider,
-              timestamp,
-            ),
-          });
+          const returnValues = decodeCreateGame(
+            txReceiptFilter,
+            provider,
+            timestamp,
+          );
+          if (returnValues) {
+            eventWithTypes.push({
+              ...txReceiptFilter,
+              eventType: EventType.CreateGame,
+              returnValues,
+            });
+          }
         } else if (
-          event.keys.includes(EventTopic.LOTTERY_STARTED) &&
-          formattedContractAddress(event.from_address) === chain.lotteryContract
+          event.keys.includes(EventTopic.SETTLE_GAME) &&
+          formattedContractAddress(event.from_address) ===
+            chain.starkFlipContract
         ) {
-          eventWithTypes.push({
-            ...txReceiptFilter,
-            eventType: EventType.StartNewLottery,
-            returnValues: decodeNewLotteryStarted(txReceiptFilter, provider),
-          });
-        } else if (
-          event.keys.includes(EventTopic.DRAWN_NUMBERS) &&
-          formattedContractAddress(event.from_address) === chain.lotteryContract
-        ) {
-          eventWithTypes.push({
-            ...txReceiptFilter,
-            eventType: EventType.DrawnNumbers,
-            returnValues: decodeDrawnNumbersReturnValue(
-              txReceiptFilter,
-              provider,
-            ),
-          });
-        } else if (
-          event.keys.includes(EventTopic.WITHDRAW_WINNING) &&
-          formattedContractAddress(event.from_address) === chain.lotteryContract
-        ) {
-          eventWithTypes.push({
-            ...txReceiptFilter,
-            eventType: EventType.WithdrawWinning,
-            returnValues: decodeWithdrawWinningReturnValue(
-              txReceiptFilter,
-              provider,
-            ),
-          });
+          const returnValues = decodeSettleGame(
+            txReceiptFilter,
+            provider,
+            timestamp,
+          );
+          if (returnValues) {
+            eventWithTypes.push({
+              ...txReceiptFilter,
+              eventType: EventType.SettleGame,
+              returnValues,
+            });
+          }
         }
+
+        // if (
+        //   event.keys.includes(EventTopic.TICKET_CREATED) &&
+        //   formattedContractAddress(event.from_address) === chain.ticketContract
+        // ) {
+        //   eventWithTypes.push({
+        //     ...txReceiptFilter,
+        //     eventType: EventType.TicketCreated,
+        //     returnValues: decodeTicketCreated(
+        //       txReceiptFilter,
+        //       provider,
+        //       timestamp,
+        //     ),
+        //   });
+        // } else if (
+        //   event.keys.includes(EventTopic.LOTTERY_STARTED) &&
+        //   formattedContractAddress(event.from_address) === chain.lotteryContract
+        // ) {
+        //   eventWithTypes.push({
+        //     ...txReceiptFilter,
+        //     eventType: EventType.StartNewLottery,
+        //     returnValues: decodeNewLotteryStarted(txReceiptFilter, provider),
+        //   });
+        // } else if (
+        //   event.keys.includes(EventTopic.DRAWN_NUMBERS) &&
+        //   formattedContractAddress(event.from_address) === chain.lotteryContract
+        // ) {
+        //   eventWithTypes.push({
+        //     ...txReceiptFilter,
+        //     eventType: EventType.DrawnNumbers,
+        //     returnValues: decodeDrawnNumbersReturnValue(
+        //       txReceiptFilter,
+        //       provider,
+        //     ),
+        //   });
+        // } else if (
+        //   event.keys.includes(EventTopic.WITHDRAW_WINNING) &&
+        //   formattedContractAddress(event.from_address) === chain.lotteryContract
+        // ) {
+        //   eventWithTypes.push({
+        //     ...txReceiptFilter,
+        //     eventType: EventType.WithdrawWinning,
+        //     returnValues: decodeWithdrawWinningReturnValue(
+        //       txReceiptFilter,
+        //       provider,
+        //     ),
+        //   });
+        // }
       }
     }
     return eventWithTypes;

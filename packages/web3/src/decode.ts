@@ -2,6 +2,81 @@ import { BigNumberish, Contract, Provider, num } from 'starknet';
 import { ABIS } from './types';
 import { formattedContractAddress } from '@app/shared/utils';
 
+export type CreateGameReturnValue = {
+  gameId: string;
+  player: string;
+  stakedAmount: string;
+  guess: number;
+  feeRate: number;
+  startedAt: number;
+};
+
+export const decodeCreateGame = (
+  txReceipt: any,
+  provider: Provider,
+  timestamp: number,
+): CreateGameReturnValue => {
+  const contract = new Contract(
+    ABIS.StarkFlipAbi,
+    formattedContractAddress(txReceipt.events[0].from_address),
+    provider,
+  );
+
+  const parsedEvent =
+    contract.parseEvents(txReceipt)[0][
+      'starkflip::starkflip::StarkFlip::StarkFlip::CreateGame'
+    ];
+
+  const returnValue: CreateGameReturnValue = {
+    gameId: num.toHex(parsedEvent.id as BigNumberish),
+    player: formattedContractAddress(
+      num.toHex(parsedEvent.player as BigNumberish),
+    ),
+    stakedAmount: (parsedEvent.staked as BigNumberish).toString(),
+    guess: Number(parsedEvent.guess as BigNumberish),
+    feeRate: Number(parsedEvent.fee_rate as BigNumberish),
+    startedAt: timestamp,
+  };
+
+  return returnValue;
+};
+
+export type SettleGameReturnValue = {
+  gameId: string;
+  player: string;
+  isWon: boolean;
+  stakedAmount: string;
+  settledAt: number;
+};
+
+export const decodeSettleGame = (
+  txReceipt: any,
+  provider: Provider,
+  timestamp: number,
+): SettleGameReturnValue => {
+  const contract = new Contract(
+    ABIS.StarkFlipAbi,
+    formattedContractAddress(txReceipt.events[0].from_address),
+    provider,
+  );
+
+  const parsedEvent =
+    contract.parseEvents(txReceipt)[0][
+      'starkflip::starkflip::StarkFlip::StarkFlip::SettleGame'
+    ];
+  const returnValue: SettleGameReturnValue = {
+    gameId: num.toHex(parsedEvent.game_id as BigNumberish),
+    player: formattedContractAddress(
+      num.toHex(parsedEvent.player as BigNumberish),
+    ),
+    isWon: parsedEvent.is_won as any,
+    stakedAmount: (parsedEvent.staked_amount as BigNumberish).toString(),
+    settledAt: timestamp,
+  };
+
+  return returnValue;
+};
+
 export type TicketCreatedReturnValue = {
   ticketId: number;
   user: string;
@@ -10,7 +85,6 @@ export type TicketCreatedReturnValue = {
   pickedNumbers: number[];
   boughtTime: number;
 };
-
 export const decodeTicketCreated = (
   txReceipt: any,
   provider: Provider,

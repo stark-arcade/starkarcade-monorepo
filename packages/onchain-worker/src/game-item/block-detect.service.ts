@@ -5,34 +5,43 @@ import {
   BlockDocument,
   BlockWorkerStatus,
   ChainDocument,
-  retryUntil,
 } from '@app/shared/models/schemas';
 import { Web3Service } from '@app/web3/web3.service';
 import { BlockStatus, Block, Provider, RpcProvider } from 'starknet';
 import { arraySliceProcess } from '@app/shared/utils/arrayLimitProcess';
-import { GameItemService } from './game-item.service';
+import { EventType, LogsReturnValues } from '@app/web3/types';
+import { Queue } from 'bull';
+import { OnchainQueueService } from './queue/onchainQueue';
+import { ONCHAIN_JOBS } from '@app/shared/types';
+import { retryUntil } from '@app/shared/utils';
 
 export class BlockDetectService extends OnchainWorker {
   constructor(
+    createGameQueue: Queue<LogsReturnValues>,
+    settleGameQueue: Queue<LogsReturnValues>,
+    onchainQueue: OnchainQueueService,
     blockModel: Model<BlockDocument>,
     web3Service: Web3Service,
     chain: ChainDocument,
-    gameService: GameItemService,
   ) {
     super(1000, 10, `${BlockDetectService.name}:${chain.name}`);
     this.logger.log('Created');
     this.web3Service = web3Service;
-    this.gameService = gameService;
     this.chain = chain;
     this.chainId = chain.id;
     this.blockModel = blockModel;
+    this.createGameQueue = createGameQueue;
+    this.settleGameQueue = settleGameQueue;
+    this.onchainQueue = onchainQueue;
   }
   chainId: string;
   web3Service: Web3Service;
   provider: Provider;
   chain: ChainDocument;
-  gameService: GameItemService;
   blockModel: Model<BlockDocument>;
+  createGameQueue: Queue<LogsReturnValues>;
+  settleGameQueue: Queue<LogsReturnValues>;
+  onchainQueue: OnchainQueueService;
 
   fetchLatestBlock: () => Promise<number> = async () => {
     const latestBlock = await this.provider.getBlock('latest');
@@ -146,7 +155,22 @@ export class BlockDetectService extends OnchainWorker {
 
     //process event
     for (const event of eventWithType) {
-      await this.gameService.processEvent(event, this.chain);
+      let queue: Queue<LogsReturnValues> = null;
+      let jobName: string = null;
+
+      switch (event.eventType) {
+        case EventType.CreateGame:
+          queue = this.createGameQueue;
+          jobName = ONCHAIN_JOBS.JOB_CREATE_GAME;
+          break;
+        case EventType.SettleGame:
+          queue = this.settleGameQueue;
+          jobName = ONCHAIN_JOBS.JOB_SETTLE_GAME;
+          break;
+      }
+      if (queue && jobName) {
+        await this.onchainQueue.add(queue, jobName, event);
+      }
     }
     return trasactionReceipt;
   }
