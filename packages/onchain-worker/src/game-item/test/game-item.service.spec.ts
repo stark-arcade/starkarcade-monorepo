@@ -1,5 +1,5 @@
 import { Connection, Model, connect } from 'mongoose';
-import { GameItemService } from '../game-item.service';
+import { GameItemService } from '../../../../onchain-queue/src/game-item.service';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import {
   BlockDocument,

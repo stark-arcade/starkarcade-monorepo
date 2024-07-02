@@ -28,6 +28,9 @@ export class StarkFlip extends BaseSchema {
   stakedAmount: string;
 
   @Prop()
+  reward?: string;
+
+  @Prop()
   feeRate: number;
 }
 
