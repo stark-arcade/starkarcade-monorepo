@@ -5,16 +5,15 @@ import {
   BlockDocument,
   BlockWorkerStatus,
   ChainDocument,
-  retryUntil,
 } from '@app/shared/models/schemas';
 import { Web3Service } from '@app/web3/web3.service';
 import { BlockStatus, Block, Provider, RpcProvider } from 'starknet';
 import { arraySliceProcess } from '@app/shared/utils/arrayLimitProcess';
-import { GameItemService } from './game-item.service';
 import { EventType, LogsReturnValues } from '@app/web3/types';
 import { Queue } from 'bull';
 import { OnchainQueueService } from './queue/onchainQueue';
 import { ONCHAIN_JOBS } from '@app/shared/types';
+import { retryUntil } from '@app/shared/utils';
 
 export class BlockDetectService extends OnchainWorker {
   constructor(
@@ -24,12 +23,10 @@ export class BlockDetectService extends OnchainWorker {
     blockModel: Model<BlockDocument>,
     web3Service: Web3Service,
     chain: ChainDocument,
-    gameService: GameItemService,
   ) {
     super(1000, 10, `${BlockDetectService.name}:${chain.name}`);
     this.logger.log('Created');
     this.web3Service = web3Service;
-    this.gameService = gameService;
     this.chain = chain;
     this.chainId = chain.id;
     this.blockModel = blockModel;
@@ -41,7 +38,6 @@ export class BlockDetectService extends OnchainWorker {
   web3Service: Web3Service;
   provider: Provider;
   chain: ChainDocument;
-  gameService: GameItemService;
   blockModel: Model<BlockDocument>;
   createGameQueue: Queue<LogsReturnValues>;
   settleGameQueue: Queue<LogsReturnValues>;

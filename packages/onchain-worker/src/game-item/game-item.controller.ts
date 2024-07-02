@@ -1,5 +1,4 @@
 import { Controller } from '@nestjs/common';
-import { GameItemService } from './game-item.service';
 import { BlockDetectService } from './block-detect.service';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -21,7 +20,6 @@ export class GameItemController {
   constructor(
     @InjectModel(Chains.name) private readonly chainModel: Model<ChainDocument>,
     @InjectModel(Blocks.name) private readonly blockModel: Model<BlockDocument>,
-    private readonly gameService: GameItemService,
     @InjectQueue(ONCHAIN_QUEUES.QUEUE_CREATE_GAME)
     private readonly createGameQueue: Queue<LogsReturnValues>,
     @InjectQueue(ONCHAIN_QUEUES.QUEUE_SETTLE_GAME)
@@ -46,7 +44,6 @@ export class GameItemController {
             this.blockModel,
             this.web3Service,
             chain,
-            this.gameService,
           ),
       );
 

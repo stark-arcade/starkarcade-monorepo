@@ -2,12 +2,16 @@ import {
   ChainDocument,
   Lotteries,
   LotteryDocument,
+  StarkFlip,
+  StarkFlipDocument,
   TicketDocument,
   Tickets,
 } from '@app/shared/models/schemas';
 import {
+  CreateGameReturnValue,
   DrawnNumbersReturnValue,
   NewLotteryStartReturnValue,
+  SettleGameReturnValue,
   TicketCreatedReturnValue,
   WithdrawWinningReturnValue,
 } from '@app/web3/decode';
@@ -16,9 +20,10 @@ import { Web3Service } from '@app/web3/web3.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { UserService } from '../users/user.service';
-import { LotteryStatus } from '@app/shared/types';
+import { FEE_PRECISION, LotteryStatus } from '@app/shared/types';
 import { initPricerMultiplier } from '@app/web3/constant';
+import { UserService } from './users/user.service';
+import { delay } from '@app/shared/utils';
 
 @Injectable()
 export class GameItemService {
@@ -27,6 +32,8 @@ export class GameItemService {
     private readonly ticketModel: Model<TicketDocument>,
     @InjectModel(Lotteries.name)
     private readonly lotteryModel: Model<LotteryDocument>,
+    @InjectModel(StarkFlip.name)
+    private readonly starkFlipModel: Model<StarkFlipDocument>,
     private readonly web3Service: Web3Service,
     private readonly userService: UserService,
   ) {}
@@ -39,6 +46,8 @@ export class GameItemService {
     process[EventType.StartNewLottery] = this.processNewLotteryCreated;
     process[EventType.DrawnNumbers] = this.processDrawnNumbers;
     process[EventType.WithdrawWinning] = this.processWithdrawWinning;
+    process[EventType.CreateGame] = this.processCreateStarkFlipGame;
+    process[EventType.SettleGame] = this.processSettleStarkFlipGame;
 
     await process[log.eventType].call(this, log, chain);
   }
@@ -103,6 +112,65 @@ export class GameItemService {
 
     const newTicket = await this.ticketModel.create(ticketEntity);
     return newTicket;
+  }
+
+  async processCreateStarkFlipGame(
+    log: LogsReturnValues,
+    chain: ChainDocument,
+  ) {
+    const { gameId, player, stakedAmount, guess, feeRate, startedAt } =
+      log.returnValues as CreateGameReturnValue;
+
+    this.logger.debug(
+      `New StarkFlip was created by ${player} with game id - ${gameId} at ${new Date(startedAt)}`,
+    );
+
+    const newGame: StarkFlip = {
+      gameId,
+      player,
+      guess,
+      startedAt,
+      stakedAmount,
+      feeRate,
+    };
+
+    await this.starkFlipModel.findOneAndUpdate(
+      { gameId },
+      { $set: newGame },
+      { upsert: true },
+    );
+  }
+
+  async processSettleStarkFlipGame(
+    log: LogsReturnValues,
+    chain: ChainDocument,
+  ) {
+    const { gameId, player, stakedAmount, isWon, settledAt } =
+      log.returnValues as SettleGameReturnValue;
+
+    this.logger.debug(
+      `Settle StarkFlip with game id - ${gameId} at ${new Date(settledAt)}`,
+    );
+
+    let isFinish = false;
+    while (!isFinish) {
+      const game = await this.starkFlipModel.findOne({ gameId });
+      if (!game) {
+        await delay(1);
+      } else {
+        game.isWon = isWon;
+        game.settledAt = settledAt;
+        game.reward = isWon
+          ? (
+              Number(game.stakedAmount) -
+              (Number(game.stakedAmount) * game.feeRate) / FEE_PRECISION
+            ).toString()
+          : '0';
+
+        await game.save();
+        isFinish = true;
+      }
+    }
   }
 
   async processTicketCreated(log: LogsReturnValues, chain: ChainDocument) {
