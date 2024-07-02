@@ -11,6 +11,8 @@ export enum EventTopic {
   LOTTERY_STARTED = '0x1b009627a191bdefc95afc44ac77f4d4f9d6a4209e8b4461dfbe11530bb1222',
   DRAWN_NUMBERS = '0x1d9ef9b22b4d2736713032ee746f4f355e05f1b2258bbcfb4489de3f14c67b',
   WITHDRAW_WINNING = '',
+  CREATE_GAME = '0x3db312ff232622e76f693259435f65b88e47d04f859eb8bd53ae0d7ba34e3c6',
+  SETTLE_GAME = '0x1c1c556a8deff5f5dcc895ef79f280abfa7ad67dfa4fb89a05bda4a1ce4974b',
 }
 
 export enum StarkFlipEnum {
@@ -46,6 +48,8 @@ export enum EventType {
   DrawnNumbers = 'DrawnNumbers',
   WithdrawWinning = 'WithdrawWinning',
   TicketCreated = 'TicketCreated',
+  CreateGame = 'CreateGame',
+  SettleGame = 'SettleGame',
 }
 export type LogsReturnValues = SuccessfulTransactionReceiptResponse & {
   returnValues: any;

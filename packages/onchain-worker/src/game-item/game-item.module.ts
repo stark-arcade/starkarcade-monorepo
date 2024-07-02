@@ -16,6 +16,8 @@ import {
   UserSchema,
   Users,
 } from '@app/shared/models/schemas';
+import { BullModule } from '@nestjs/bull';
+import { MQ_JOB_DEFAULT_CONFIG, ONCHAIN_QUEUES } from '@app/shared/types';
 
 @Module({
   imports: [
@@ -26,6 +28,16 @@ import {
       { name: Tickets.name, schema: TicketSchema },
       { name: Blocks.name, schema: BlockSchema },
     ]),
+    BullModule.registerQueue(
+      {
+        name: ONCHAIN_QUEUES.QUEUE_CREATE_GAME,
+        defaultJobOptions: MQ_JOB_DEFAULT_CONFIG,
+      },
+      {
+        name: ONCHAIN_QUEUES.QUEUE_SETTLE_GAME,
+        defaultJobOptions: MQ_JOB_DEFAULT_CONFIG,
+      },
+    ),
   ],
   providers: [GameItemService, Web3Service, UserService],
   controllers: [GameItemController],
