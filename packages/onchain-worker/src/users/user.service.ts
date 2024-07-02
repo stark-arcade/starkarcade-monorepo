@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { plainToInstance } from 'class-transformer';
 import { Model } from 'mongoose';
+import { v1 as uuidv1 } from 'uuid';
 
 @Injectable()
 export class UserService {
@@ -20,7 +21,7 @@ export class UserService {
       const newUser: Users = {
         address: userAddress,
         username: userAddress,
-        nonce: Math.floor(Math.random() * 1000000),
+        nonce: uuidv1(),
         isVerified: false,
         roles: [],
       };

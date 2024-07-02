@@ -4,6 +4,7 @@ export * from './user.schema';
 export * from './lottery.schema';
 export * from './ticket.schema';
 export * from './block.schema';
+export * from './starkflip.schema';
 
 export async function retryUntil<T>(
   operation: () => Promise<T>,
