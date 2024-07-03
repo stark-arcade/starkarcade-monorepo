@@ -151,8 +151,9 @@ export class Web3Service {
         };
         if (
           event.keys.includes(EventTopic.CREATE_GAME) &&
-          formattedContractAddress(event.from_address) ===
-            chain.starkFlipContract
+          chain.starkFlipContracts.includes(
+            formattedContractAddress(event.from_address),
+          )
         ) {
           const returnValues = decodeCreateGame(
             txReceiptFilter,
@@ -168,8 +169,9 @@ export class Web3Service {
           }
         } else if (
           event.keys.includes(EventTopic.SETTLE_GAME) &&
-          formattedContractAddress(event.from_address) ===
-            chain.starkFlipContract
+          chain.starkFlipContracts.includes(
+            formattedContractAddress(event.from_address),
+          )
         ) {
           const returnValues = decodeSettleGame(
             txReceiptFilter,

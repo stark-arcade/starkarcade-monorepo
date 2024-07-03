@@ -22,7 +22,7 @@ export class CreateGameProcessor {
 
   logger = new Logger(CreateGameProcessor.name);
 
-  @Process({ name: ONCHAIN_JOBS.JOB_CREATE_GAME, concurrency: 100 })
+  @Process({ name: ONCHAIN_JOBS.JOB_CREATE_GAME, concurrency: 10 })
   async detectCreateGame(job: Job<LogsReturnValues>) {
     const event = job.data;
     const maxRetry = 10;
