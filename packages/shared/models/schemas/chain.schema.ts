@@ -38,6 +38,9 @@ export class Chains extends BaseSchema {
 
   @Prop()
   starkFlipPool: string;
+
+  @Prop()
+  starkFlipContracts: string[];
 }
 
 export const ChainSchema = SchemaFactory.createForClass(Chains);

@@ -111,7 +111,7 @@ export class BlockDetectService extends OnchainWorker {
       },
     );
 
-    const batchProcess = 20;
+    const batchProcess = 10;
     const maxRetry = 10;
     //batch process 10 txs, max retry 10 times
     await arraySliceProcess(
