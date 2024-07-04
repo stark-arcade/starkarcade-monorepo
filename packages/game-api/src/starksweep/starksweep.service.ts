@@ -22,11 +22,11 @@ export type StarkSweepParam = {
   rotateSpeed: number;
   radius: number;
   platformOffset: { x: number; y: number };
-  currentPoint: number;
-  previousPoint: number;
-  level: number; // mỗi level có 5 stage nên mỗi lần thay đổi level là người chơi đã chơi 5 màn
+  level: number;
   isCoinCollected: boolean;
   collectedCoin: number;
+  levelCoin: number;
+  inLevelCollectCoin: number;
   direction: number;
 };
 
@@ -83,7 +83,8 @@ export class StarkSweepService {
       client.mainBrush.x,
       client.mainBrush.y,
     );
-    return distance < client.radius + 1;
+    // console.log("distance: " + distance);
+    return distance <= client.radius + 2;
   }
 
   private async sign_transaction(client: StarkSweepParam, address: string) {
@@ -122,11 +123,11 @@ export class StarkSweepService {
       rotateSpeed: 0.2,
       radius: 4,
       platformOffset: { x: 0, y: 0 },
-      currentPoint: 0,
-      previousPoint: 0,
       level: 0,
       isCoinCollected: true,
       collectedCoin: 0,
+      levelCoin: 0,
+      inLevelCollectCoin: 0,
       direction: 1,
     });
 
@@ -197,29 +198,42 @@ export class StarkSweepService {
 
     if (level == 0) {
       client.level = level;
+      client.levelCoin = 0;
     }
+    // update levelCoin
     if (level != client.level) {
       client.level = level;
-      client.isCoinCollected = false;
+      if (level < 5) {
+        client.levelCoin = level;
+      } else if (5 <= level && level <= 10) {
+        client.levelCoin = 5;
+      } else {
+        const temp = level / 10;
+        client.levelCoin = parseInt(temp.toString()) * 10;
+      }
+      client.inLevelCollectCoin = 0;
     }
-    client.socket.emit('spawnCoin', (!client.isCoinCollected).toString());
+    console.log('Level: ' + level);
+    console.log('Level Coin: ' + client.levelCoin);
+    client.socket.emit('updateLevelCoin', client.levelCoin.toString());
   }
 
   handleCoinCollect(socket: Socket, positionX: string, positionY: string) {
     const client = this.sockets.find((i) => i.socket == socket);
 
     if (
-      client.isCoinCollected == false &&
       this.check_true(client, {
         x: parseFloat(positionX),
         y: parseFloat(positionY),
       })
     ) {
-      client.isCoinCollected = true;
-      client.collectedCoin++;
-      client.socket.emit('updateCoin', client.collectedCoin.toString());
+      if (client.inLevelCollectCoin < client.levelCoin) {
+        client.isCoinCollected = true;
+        client.collectedCoin++;
+        client.inLevelCollectCoin++;
+        client.socket.emit('updateCoin', client.collectedCoin.toString());
+      }
     }
-    client.socket.emit('spawnCoin', (!client.isCoinCollected).toString());
   }
 
   async handleClaim(socket: Socket, address: string) {

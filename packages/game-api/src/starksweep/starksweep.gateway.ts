@@ -39,7 +39,6 @@ export class StarkSweepGateway
 
   @SubscribeMessage('setBrushPosition')
   handleSetBrushPosition(client: Socket, data: any) {
-    // console.log("Set Brush position x1: " + x1 + " y1: " + y1 + " x2: " + x2 + " y2: " + y2);
     this.starkSweepService.handleSetBrushPosition(
       client,
       data[0],
@@ -75,7 +74,6 @@ export class StarkSweepGateway
 
   @SubscribeMessage('claim')
   handleClaim(client: Socket, address: string) {
-    console.log('claim: ' + address);
     this.starkSweepService.handleClaim(client, address);
   }
 
