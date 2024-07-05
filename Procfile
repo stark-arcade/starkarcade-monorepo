@@ -1,1 +1,1 @@
-web: yarn workspace game-api start
+web: yarn workspace game-api start:prod
