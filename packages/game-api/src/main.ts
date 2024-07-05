@@ -33,7 +33,7 @@ async function bootstrap() {
 
   app.enableCors();
 
-  await app.listen(configuration().api_port || 5001, () => {
+  await app.listen(process.env.PORT || 5001, () => {
     console.log(`Game api is runnning on port ${configuration().api_port}`);
   });
 }
