@@ -23,7 +23,7 @@ import { StarkSweepModule } from './starksweep/starksweep.module';
     AuthenModule,
     Game2048Module,
     TetrisModule,
-    StarkFlipModule,
+    // StarkFlipModule,
     StarkSweepModule,
   ],
   controllers: [AppController],
