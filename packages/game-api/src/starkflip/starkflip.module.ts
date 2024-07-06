@@ -1,4 +1,9 @@
-import { ChainSchema, Chains } from '@app/shared/models/schemas';
+import {
+  ChainSchema,
+  Chains,
+  StarkFlip,
+  StarkFlipSchema,
+} from '@app/shared/models/schemas';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { StarkFlipService } from './starkflip.service';
@@ -8,7 +13,10 @@ import { StarkFlipController } from './starkflip.controller';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Chains.name, schema: ChainSchema }]),
+    MongooseModule.forFeature([
+      { name: Chains.name, schema: ChainSchema },
+      { name: StarkFlip.name, schema: StarkFlipSchema },
+    ]),
   ],
   providers: [StarkFlipService, StarkFlipGateWay, SettleWorker],
   controllers: [StarkFlipController],
