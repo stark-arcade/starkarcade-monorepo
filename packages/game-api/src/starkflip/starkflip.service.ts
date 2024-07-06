@@ -74,14 +74,14 @@ export class StarkFlipService {
             totalFlipped: { $sum: 1 },
             winAmount: {
               $sum: {
-                $cond: ['$isWon', { $toDouble: '$stakedAmount' }, 0],
+                $cond: [{ $eq: ['$isWon', true] }, { $toDouble: '$reward' }, 0],
               },
             },
-            lostAmount: {
-              $sum: {
-                $cond: ['$isWon', 0, { $toDouble: '$stakedAmount' }],
-              },
-            },
+            // lostAmount: {
+            //   $sum: {
+            //     $cond: ['$isWon', 0, { $toDouble: '$stakedAmount' }],
+            //   },
+            // },
             wins: { $sum: { $cond: ['$isWon', 1, 0] } },
             losses: { $sum: { $cond: ['$isWon', 0, 1] } },
           },
@@ -100,7 +100,7 @@ export class StarkFlipService {
             lostAmount: 1,
             wins: 1,
             losses: 1,
-            total: { $sum: ['$winAmount', '$lostAmount'] },
+            total: { $sum: ['$winAmount'] },
           },
         },
         {
