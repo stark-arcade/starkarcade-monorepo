@@ -14,6 +14,10 @@ import { RpcProvider, Contract } from 'starknet';
 import { SettleParam, SettleWorker } from './settleWorker';
 import { num, BigNumberish } from 'starknet';
 import { WsException } from '@nestjs/websockets';
+import { StarkFlipQuery } from './dto/starkFlipQuery';
+import { formattedContractAddress } from '@app/shared/utils';
+import { BaseResultPagination } from '@app/shared/types/base.result.pagination';
+import { PaginationDto } from '@app/shared/types/pagination.dto';
 
 export type StarkFlipParam = {
   socket: Socket;
@@ -84,6 +88,7 @@ export class StarkFlipService {
             // },
             wins: { $sum: { $cond: ['$isWon', 1, 0] } },
             losses: { $sum: { $cond: ['$isWon', 0, 1] } },
+            updatedAt: { $max: '$updatedAt' },
           },
         },
         {
@@ -100,6 +105,7 @@ export class StarkFlipService {
             lostAmount: 1,
             wins: 1,
             losses: 1,
+            updatedAt: 1,
             total: { $sum: ['$winAmount'] },
           },
         },
@@ -114,6 +120,7 @@ export class StarkFlipService {
             winAmount: 1,
             wins: 1,
             losses: 1,
+            updatedAt: 1,
             rank: { $literal: 0 },
           },
         },
@@ -124,5 +131,38 @@ export class StarkFlipService {
       ...item,
       rank: index + 1,
     }));
+  }
+
+  async handleGetRentWinner() {
+    const result = await this.starkflipModel
+      .find({
+        isWon: true,
+      })
+      .sort({ updatedAt: -1 })
+      .limit(5)
+      .exec();
+    return result;
+  }
+
+  async handleGetHistory(query: StarkFlipQuery) {
+    const result = new BaseResultPagination<any>();
+    const filter: any = {};
+    if (query.address) {
+      filter.player = formattedContractAddress(query.address);
+    }
+    const count = await this.starkflipModel.countDocuments(filter);
+    if (query.size === 0) {
+      result.data = new PaginationDto([], count, query.page, query.size);
+      return result;
+    }
+
+    const items = await this.starkflipModel
+      .find(filter)
+      .sort(query.sort)
+      .skip(query.skipIndex)
+      .limit(query.size)
+      .exec();
+    result.data = new PaginationDto(items, count, query.page, query.size);
+    return result;
   }
 }
