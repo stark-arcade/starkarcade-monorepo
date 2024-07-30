@@ -13,6 +13,7 @@ export default () => ({
     game_tetris: Number(process.env.PORT_TETRIS) || 5003,
     stark_flip: Number(process.env.PORT_STARKFLIP) || 5004,
     stark_sweep: Number(process.env.PORT_STARKSWEEP) || 5005,
+    brew_master: Number(process.env.PORT_BREWMASTER) || 5006,
   },
   beginBlock: Number(process.env.BEGIN_BLOCK) || 0,
   jwt: {
