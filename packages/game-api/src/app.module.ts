@@ -10,6 +10,7 @@ import { Game2048Module } from './2048/2048.module';
 import { TetrisModule } from './tetris/tetris.module';
 import { StarkFlipModule } from './starkflip/starkflip.module';
 import { StarkSweepModule } from './starksweep/starksweep.module';
+import { BrewMasterModule } from './brewmaster/brewmaster.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { StarkSweepModule } from './starksweep/starksweep.module';
     TetrisModule,
     StarkFlipModule,
     StarkSweepModule,
+    BrewMasterModule,
   ],
   controllers: [AppController],
   providers: [AppService],
