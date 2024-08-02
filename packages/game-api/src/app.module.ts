@@ -11,6 +11,10 @@ import { TetrisModule } from './tetris/tetris.module';
 import { StarkFlipModule } from './starkflip/starkflip.module';
 import { StarkSweepModule } from './starksweep/starksweep.module';
 import { BrewMasterModule } from './brewmaster/brewmaster.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { MailingModule } from './mailing/mailing.module';
+import { StarkArcadeHubModule } from './starkarcade-hub/starkarcadeHub.module';
 
 @Module({
   imports: [
@@ -20,6 +24,16 @@ import { BrewMasterModule } from './brewmaster/brewmaster.module';
     }),
 
     MongooseModule.forRoot(configuration().db_path),
+    MailerModule.forRoot({
+      transport: `smtps://${process.env.EMAIL}:${process.env.PASS}@smtp.gmail.com/`,
+      template: {
+        dir: process.cwd() + '/templates/',
+        adapter: new HandlebarsAdapter(), // or new PugAdapter()
+        options: {
+          strict: true,
+        },
+      },
+    }),
     UserModule,
     AuthenModule,
     Game2048Module,
@@ -27,6 +41,8 @@ import { BrewMasterModule } from './brewmaster/brewmaster.module';
     StarkFlipModule,
     StarkSweepModule,
     BrewMasterModule,
+    MailingModule,
+    StarkArcadeHubModule,
   ],
   controllers: [AppController],
   providers: [AppService],
