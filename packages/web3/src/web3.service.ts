@@ -28,7 +28,11 @@ import {
 } from './decode';
 import governanceAbi from './abi/governance.json';
 import { initPricerMultiplier } from './constant';
-import { formattedContractAddress } from '@app/shared/utils';
+import {
+  attemptOperations,
+  convertDataIntoString,
+  formattedContractAddress,
+} from '@app/shared/utils';
 
 @Injectable()
 export class Web3Service {
@@ -43,11 +47,11 @@ export class Web3Service {
     return block.timestamp;
   }
 
-  async getContractInstance(
+  getContractInstance(
     abi: any,
     contractAddress: string,
     rpc: string,
-  ): Promise<Contract> {
+  ): Contract {
     const provider = this.getProvider(rpc);
     const contractInstance = new Contract(abi, contractAddress, provider);
     return contractInstance;
@@ -237,6 +241,42 @@ export class Web3Service {
       }
     }
     return eventWithTypes;
+  }
+
+  async getERC20TokenInfo(contractAddress: string, rpc: string) {
+    const contractInstance = this.getContractInstance(
+      ABIS.ERC20ABI,
+      contractAddress,
+      rpc,
+    );
+
+    const name = await contractInstance.name();
+    const symbol = await contractInstance.symbol();
+    const decimals = await contractInstance.decimals();
+
+    if (!name || !symbol || !decimals) {
+      return null;
+    }
+
+    return {
+      name: convertDataIntoString(name),
+      symbol: convertDataIntoString(symbol),
+      decimals: Number((decimals as bigint).toString()),
+    };
+  }
+
+  async checkInterfaceSupported(
+    address: string,
+    rpc: string,
+    interfaceId: string,
+  ): Promise<boolean | null> {
+    const provider = this.getProvider(rpc);
+    const src5Instance = new Contract(ABIS.SRC5ABI, address, provider);
+    const supportInterfaceOperators = [
+      () => src5Instance.supports_interface(interfaceId),
+      () => src5Instance.supportsInterface(interfaceId),
+    ];
+    return await attemptOperations(supportInterfaceOperators);
   }
 
   async invokeContractAsAdmin(

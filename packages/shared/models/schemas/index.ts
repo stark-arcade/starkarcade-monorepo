@@ -5,3 +5,5 @@ export * from './lottery.schema';
 export * from './ticket.schema';
 export * from './block.schema';
 export * from './starkflip.schema';
+export * from './tokeninfo.schema';
+export * from './submitgame.schema';

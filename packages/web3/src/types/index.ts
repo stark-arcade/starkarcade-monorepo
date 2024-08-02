@@ -5,6 +5,8 @@ import ticketAbi from '../abi/ticket.json';
 import lotteryAbi from '../abi/lottery645.json';
 import accountAbi from '../abi/account.json';
 import starkFlipAbi from '../abi/starkflip.json';
+import erc20Abi from '../abi/erc20.json';
+import src5Abi from '../abi/src5.json';
 
 export enum EventTopic {
   TICKET_CREATED = '0x2013b4817f658d5d62bc494cf84c1dfa1150756dcf9783d0fc31d8133795c6d',
@@ -57,6 +59,8 @@ export type LogsReturnValues = SuccessfulTransactionReceiptResponse & {
 };
 
 export const ABIS = {
+  SRC5ABI: src5Abi,
+  ERC20ABI: erc20Abi,
   TicketABI: ticketAbi,
   LotteryABI: lotteryAbi,
   AccountABI: accountAbi,
