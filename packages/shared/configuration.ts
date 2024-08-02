@@ -33,4 +33,10 @@ export default () => ({
     address: String(process.env.DEALER_ADDRESS),
     private_key: String(process.env.DEALER_PRIVATE_KEY),
   },
+  google_authen: {
+    email: String(process.env.EMAIL),
+    client_id: String(process.env.CLIENT_ID),
+    client_secret: String(process.env.CLIENT_SECRET),
+    refresh_token: String(process.env.REFRESH_TOKEN),
+  },
 });
