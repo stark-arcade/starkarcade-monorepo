@@ -24,7 +24,7 @@ export class SubmitGames extends BaseSchema {
   shortDescription: string;
 
   @Prop()
-  longDescripstion: string;
+  longDescription: string;
 
   @Prop()
   gameUrl: string;
@@ -37,6 +37,9 @@ export class SubmitGames extends BaseSchema {
 
   @Prop()
   banner: string;
+
+  @Prop()
+  totalSupply?: number;
 
   @Prop({ type: [SchemaTypes.ObjectId], ref: 'TokenInfos' })
   tokens: TokenInfoDocument[];
