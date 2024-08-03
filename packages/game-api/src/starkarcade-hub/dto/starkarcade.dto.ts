@@ -46,7 +46,7 @@ export class SubmitGameBodyDto {
   @ApiProperty()
   @IsString()
   @Length(3, 255)
-  longDescripstion: string;
+  longDescription: string;
 
   @ApiProperty()
   @IsUrl()
@@ -63,6 +63,10 @@ export class SubmitGameBodyDto {
   @ApiProperty()
   @IsUrl()
   banner: string;
+
+  @ApiProperty()
+  @IsOptional()
+  totalSupply?: number;
 
   @ApiProperty()
   @IsHexadecimal({ each: true })

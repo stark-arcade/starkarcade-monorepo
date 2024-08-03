@@ -24,15 +24,16 @@ export class StarkArcadeHubService {
       email,
       name,
       shortDescription,
-      longDescripstion,
+      longDescription,
       gameUrl,
       sourceUrl,
       logo,
       banner,
       tokens,
+      totalSupply,
     } = body;
 
-    let tokenInfos: TokenInfoDocument[] = [];
+    const tokenInfos: TokenInfoDocument[] = [];
     for (const token of tokens) {
       const tokenInfo = await this.tokenInfoService.getOrCreate(token);
       if (!tokenInfo) {
@@ -45,16 +46,20 @@ export class StarkArcadeHubService {
       email: email.trim(),
       name: name.trim(),
       shortDescription,
-      longDescripstion,
+      longDescription,
       gameUrl: gameUrl.trim(),
       sourceUrl: sourceUrl.trim(),
       logo,
       banner,
       tokens: tokenInfos,
+      totalSupply,
     };
-
-    await this.submitGameModel.create(newSubmitGame);
-
-    await this.mailingService.sendMail(email);
+    try {
+      await this.submitGameModel.create(newSubmitGame);
+      await this.mailingService.sendMail(email);
+      return newSubmitGame;
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
