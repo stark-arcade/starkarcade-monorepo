@@ -6,7 +6,7 @@ import { Socket } from 'socket.io';
 import { getRandomInt } from './game/math';
 import { getClaimPointMessage } from '@app/shared/utils';
 import { Web3Service } from '@app/web3/web3.service';
-import { Account, stark } from 'starknet';
+import { Account, ec, json, stark, RpcProvider, hash, CallData } from 'starknet';
 import configuration from '@app/shared/configuration';
 
 export type StarkSweepParam = {
@@ -112,5 +112,39 @@ export class BrewMasterService {
     if (client == undefined) return;
     client.collectedCoin = 0;
     client.socket.emit('updateCoin', client.collectedCoin.toString());
+  }
+
+  async handleAnonymousLogin(socket: Socket) {
+    const client = this.sockets.find((i) => i.socket == socket);
+
+    if (client == undefined) return;
+ 
+    // connect provider
+    const chainDocument = await this.chainModel.findOne();
+    const provider = new RpcProvider({ nodeUrl: chainDocument.rpc });
+
+    //new Argent X account v0.3.0
+    const argentXaccountClassHash = '0x1a736d6ed154502257f02b1ccdf4d9d1089f80811cd6acad48e6b6a9d1f2003';
+
+    // Generate public and private key pair.
+    const privateKeyAX = stark.randomAddress();
+    console.log('AX_ACCOUNT_PRIVATE_KEY=', privateKeyAX);
+    const starkKeyPubAX = ec.starkCurve.getStarkKey(privateKeyAX);
+    console.log('AX_ACCOUNT_PUBLIC_KEY=', starkKeyPubAX);
+
+    // Calculate future address of the ArgentX account
+    const AXConstructorCallData = CallData.compile({
+      owner: starkKeyPubAX,
+      guardian: '0',
+    });
+    const AXcontractAddress = hash.calculateContractAddressFromHash(
+      starkKeyPubAX,
+      argentXaccountClassHash,
+      AXConstructorCallData,
+      0
+    );
+    console.log('Precalculated account address=', AXcontractAddress);
+
+    client.socket.emit('updateAnonymous', [AXcontractAddress, privateKeyAX])
   }
 }
