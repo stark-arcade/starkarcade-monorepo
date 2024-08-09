@@ -118,10 +118,18 @@ export class BrewMasterService {
     const client = this.sockets.find((i) => i.socket == socket);
 
     if (client == undefined) return;
+
+    console.log("Anonymous login: " + client.socket.id);
+
+    // reset collected coin
+    client.collectedCoin = 0;
+    client.numberOfCoinCanClaim = 0;
+    client.numberOfCustomerToCoin = 0;
+    client.numberOfSpawnedCustomer = 0;
  
     // connect provider
     const chainDocument = await this.chainModel.findOne();
-    const provider = new RpcProvider({ nodeUrl: chainDocument.rpc });
+    const provider = new RpcProvider({ nodeUrl: chainDocument.rpc});
 
     //new Argent X account v0.3.0
     const argentXaccountClassHash = '0x1a736d6ed154502257f02b1ccdf4d9d1089f80811cd6acad48e6b6a9d1f2003';
@@ -145,6 +153,7 @@ export class BrewMasterService {
     );
     console.log('Precalculated account address=', AXcontractAddress);
 
-    client.socket.emit('updateAnonymous', [AXcontractAddress, privateKeyAX])
+    const str = JSON.stringify([AXcontractAddress, privateKeyAX]);
+    client.socket.emit('updateAnonymous', str)
   }
 }
