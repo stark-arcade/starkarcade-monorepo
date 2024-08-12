@@ -51,4 +51,9 @@ export class BrewMasterGateway
   handleAfterClaim(client: Socket) {
     this.BrewMasterService.handleAfterClaim(client);
   }
+
+  @SubscribeMessage('anonymousLogin')
+  handleAnonymousLogin(client: Socket) {
+    this.BrewMasterService.handleAnonymousLogin(client);
+  }
 }
