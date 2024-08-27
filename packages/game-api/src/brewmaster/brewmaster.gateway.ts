@@ -56,4 +56,29 @@ export class BrewMasterGateway
   handleAnonymousLogin(client: Socket) {
     this.BrewMasterService.handleAnonymousLogin(client);
   }
+
+  @SubscribeMessage('saveDataRequest')
+  handleSaveDataRequest(client: Socket, data: string){
+    this.BrewMasterService.handleSaveDataRequest(client, data);
+  }
+
+  @SubscribeMessage('loadDataRequest')
+  handleLoadDataRequest(client: Socket){
+    this.BrewMasterService.handleLoadDataRequest(client);
+  }
+  
+  @SubscribeMessage('shareToTwitterRequest')
+  handleTwitterTest(client: Socket, message: string){
+    this.BrewMasterService.handleShareToTwitterRequest(client, message);
+  }
+
+  @SubscribeMessage('requestUpdateTotalPoint')
+  handleRequestUpdateTotalPoint(client: Socket){
+    this.BrewMasterService.handleUpdateTotalPoint(client);
+  }
+
+  @SubscribeMessage('playerInputLink')
+  handlePlayerInputLink(client: Socket, url: string){
+    this.BrewMasterService.handlePlayerInputLink(client, url);
+  }
 }

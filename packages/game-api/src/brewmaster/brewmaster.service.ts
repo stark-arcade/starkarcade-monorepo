@@ -8,6 +8,10 @@ import { getClaimPointMessage } from '@app/shared/utils';
 import { Web3Service } from '@app/web3/web3.service';
 import { Account, ec, json, stark, RpcProvider, hash, CallData } from 'starknet';
 import configuration from '@app/shared/configuration';
+import axios from 'axios';
+import * as dotenv from 'dotenv';
+import OAuth from 'oauth-1.0a';
+import crypto from 'crypto';
 
 export type StarkSweepParam = {
   socket: Socket;
@@ -15,6 +19,8 @@ export type StarkSweepParam = {
   numberOfSpawnedCustomer: number;
   numberOfCustomerToCoin: number;
   numberOfCoinCanClaim: number;
+  savedData: string;
+  totalPoint: number;
 };
 
 @Injectable()
@@ -59,6 +65,8 @@ export class BrewMasterService {
       numberOfCoinCanClaim: 0,
       numberOfSpawnedCustomer: 0,
       numberOfCustomerToCoin: 0,
+      savedData: '',
+      totalPoint: 0,
     });
 
     setTimeout(() => {
@@ -67,6 +75,8 @@ export class BrewMasterService {
         data: 'Hello Unity',
       });
     }, 1000);
+
+    dotenv.config();
   }
 
   disconnectGame(socket: Socket) {
@@ -80,6 +90,7 @@ export class BrewMasterService {
     client.numberOfSpawnedCustomer++;
     if (client.numberOfSpawnedCustomer >= client.numberOfCustomerToCoin) {
       client.socket.emit('spawnCoin');
+      console.log('spawnCoin');
       client.numberOfCoinCanClaim++;
       client.numberOfSpawnedCustomer = 0;
       client.numberOfCustomerToCoin = getRandomInt(10, 20);
@@ -129,7 +140,8 @@ export class BrewMasterService {
  
     // connect provider
     const chainDocument = await this.chainModel.findOne();
-    const provider = new RpcProvider({ nodeUrl: chainDocument.rpc});
+    const provider = new RpcProvider({ nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'});
+    // const provider = new RpcProvider({ nodeUrl: chainDocument.rpc});
 
     //new Argent X account v0.3.0
     const argentXaccountClassHash = '0x1a736d6ed154502257f02b1ccdf4d9d1089f80811cd6acad48e6b6a9d1f2003';
@@ -155,5 +167,113 @@ export class BrewMasterService {
 
     const str = JSON.stringify([AXcontractAddress, privateKeyAX]);
     client.socket.emit('updateAnonymous', str)
+  }
+
+  async handleSaveDataRequest(socket: Socket, data: string){
+   // Save this data to server 
+    const client = this.sockets.find((i) => i.socket == socket);
+
+    if (client == undefined) return;
+    console.log("loadDataRequest");
+    client.savedData = data;
+    console.log(data);
+  }
+
+  async handleLoadDataRequest(socket: Socket) {
+    // Load data
+    const client = this.sockets.find((i) => i.socket == socket);
+
+    if (client == undefined) return;
+    client.socket.emit('loadCallback', client.savedData);
+  }
+
+  async handleUpdateTotalPoint(socket: Socket){
+    const client = this.sockets.find((i) => i.socket == socket);
+
+    if (client == undefined) return;
+
+    client.socket.emit('totalPointCallback', client.totalPoint);
+  }
+
+  async handleShareToTwitterRequest(socket: Socket, message: string){
+    const client = this.sockets.find((i) => i.socket == socket);
+
+    if (client == undefined) return;
+
+    // currently will show message that is sended by client directly. Future will get content from server
+    client.socket.emit('twitterRequestCallback', message);
+  }
+
+  extractTweetId(tweetUrl: string): string {
+    if(typeof(tweetUrl) !== 'string') 
+    {
+      tweetUrl = String(tweetUrl);
+      console.log(tweetUrl);
+    }
+
+    const urlParts = tweetUrl.split('/');
+    return urlParts[urlParts.length - 1]; // The last part is the tweet ID
+  }
+  async getTweetContent(tweetUrl: string) {
+    // Initialize OAuth
+    const oauth = new OAuth({
+      consumer: {
+        key: 'Xl43f4DrqPscsmSqerwntoAy8', // Replace with your API Key
+        secret: 'mTxdTwkaNIfMFQoPANMC5NEPXlvdT2QXDk18t8vuEkHJQXVqCd', // Replace with your API Key Secret
+      },
+      signature_method: 'HMAC-SHA1',
+      hash_function(base_string, key) {
+        return crypto.createHmac('sha1', key).update(base_string).digest('base64');
+      },
+    });
+
+    const token = {
+      key: '1366629980260605954-6p8ieHmbXR5KDtRS01BQ5ewWgNHrII', // Replace with your Access Token
+      secret: 'mM2qNBLG4fUkdaAigu7WiT4X8eTZuZ800huEslrDc6EWa', // Replace with your Access Token Secret
+    };
+    
+    const tweetId = this.extractTweetId(tweetUrl);
+    const requestData = {
+      url: `https://api.twitter.com/1.1/tweets/${tweetId}?tweet.fields=text`,
+      method: 'GET',
+    };
+    const oauthHeaders = oauth.toHeader(oauth.authorize(requestData, token));
+    const headers = {
+      ...oauthHeaders, // Spread the OAuth headers
+      'Content-Type': 'application/json', // Add any additional headers
+    };
+
+    try {
+      const response = await axios.get(requestData.url, { headers })
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching tweet:', error);
+    }
+
+    // const BEARER_TOKEN = 'AAAAAAAAAAAAAAAAAAAAABMbvgEAAAAAg%2F0jxqEKtirKhnBAC8zLFmk%2F7jQ%3D79pPYYjQsdp8dLeLVD8NhjMjiHv16W6MVNTVQtBTK2SYAXZuKi'; 
+    // const url = `https://api.x.com/2/tweets/${tweetId}?tweet.fields=text`;
+
+    // try
+    // {
+    //   const response = await axios.get(url, {
+    //     headers: {
+    //       'Authorization': `Bearer ${BEARER_TOKEN}`
+    //     }
+    //   });
+    //   return response.data;
+    // } catch (error) {
+    //   console.error('Error fetching tweet:', error);
+    // }
+    // console.log(`Bearer ${BEARER_TOKEN}`)
+  }
+
+  async handlePlayerInputLink(socket: Socket, url: string) {
+    const client = this.sockets.find((i) => i.socket == socket);
+
+    if (client == undefined) return;
+
+    this.getTweetContent(url).then(data => {
+      console.log(data.text);
+    });
   }
 }
