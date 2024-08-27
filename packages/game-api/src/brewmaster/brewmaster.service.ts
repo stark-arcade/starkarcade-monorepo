@@ -8,6 +8,7 @@ import { getClaimPointMessage } from '@app/shared/utils';
 import { Web3Service } from '@app/web3/web3.service';
 import { Account, ec, json, stark, RpcProvider, hash, CallData } from 'starknet';
 import configuration from '@app/shared/configuration';
+import * as dotenv from 'dotenv';
 
 export type StarkSweepParam = {
   socket: Socket;
@@ -15,6 +16,8 @@ export type StarkSweepParam = {
   numberOfSpawnedCustomer: number;
   numberOfCustomerToCoin: number;
   numberOfCoinCanClaim: number;
+  savedData: string;
+  totalPoint: number;
 };
 
 @Injectable()
@@ -59,6 +62,8 @@ export class BrewMasterService {
       numberOfCoinCanClaim: 0,
       numberOfSpawnedCustomer: 0,
       numberOfCustomerToCoin: 0,
+      savedData: '',
+      totalPoint: 0,
     });
 
     setTimeout(() => {
@@ -67,6 +72,8 @@ export class BrewMasterService {
         data: 'Hello Unity',
       });
     }, 1000);
+
+    dotenv.config();
   }
 
   disconnectGame(socket: Socket) {
@@ -80,6 +87,7 @@ export class BrewMasterService {
     client.numberOfSpawnedCustomer++;
     if (client.numberOfSpawnedCustomer >= client.numberOfCustomerToCoin) {
       client.socket.emit('spawnCoin');
+      console.log('spawnCoin');
       client.numberOfCoinCanClaim++;
       client.numberOfSpawnedCustomer = 0;
       client.numberOfCustomerToCoin = getRandomInt(10, 20);
@@ -129,7 +137,8 @@ export class BrewMasterService {
  
     // connect provider
     const chainDocument = await this.chainModel.findOne();
-    const provider = new RpcProvider({ nodeUrl: chainDocument.rpc});
+    const provider = new RpcProvider({ nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'});
+    // const provider = new RpcProvider({ nodeUrl: chainDocument.rpc});
 
     //new Argent X account v0.3.0
     const argentXaccountClassHash = '0x1a736d6ed154502257f02b1ccdf4d9d1089f80811cd6acad48e6b6a9d1f2003';
@@ -155,5 +164,49 @@ export class BrewMasterService {
 
     const str = JSON.stringify([AXcontractAddress, privateKeyAX]);
     client.socket.emit('updateAnonymous', str)
+  }
+
+  async handleSaveDataRequest(socket: Socket, data: string){
+   // Save this data to server 
+    const client = this.sockets.find((i) => i.socket == socket);
+
+    if (client == undefined) return;
+    console.log("loadDataRequest");
+    client.savedData = data;
+    console.log(data);
+  }
+
+  async handleLoadDataRequest(socket: Socket) {
+    // Load data
+    const client = this.sockets.find((i) => i.socket == socket);
+
+    if (client == undefined) return;
+    client.socket.emit('loadCallback', client.savedData);
+  }
+
+  async handleUpdateTotalPoint(socket: Socket){
+    const client = this.sockets.find((i) => i.socket == socket);
+
+    if (client == undefined) return;
+
+    client.socket.emit('totalPointCallback', client.totalPoint);
+  }
+
+  async handleShareToTwitterRequest(socket: Socket, message: string){
+    const client = this.sockets.find((i) => i.socket == socket);
+
+    if (client == undefined) return;
+
+    // currently will show message that is sent by client directly. Future will get content from server
+    client.socket.emit('twitterRequestCallback', message);
+  }
+
+  async handlePlayerInputLink(socket: Socket, url: string) {
+    const client = this.sockets.find((i) => i.socket == socket);
+
+    if (client == undefined) return;
+
+    // Save the link to server
+
   }
 }

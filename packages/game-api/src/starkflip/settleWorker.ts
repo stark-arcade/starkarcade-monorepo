@@ -156,7 +156,8 @@ export class SettleWorker {
 
   private async init() {
     this.chainDocument = await this.chain.findOne();
-    this.provider = new RpcProvider({ nodeUrl: this.chainDocument.rpc });
+    // this.provider = new RpcProvider({ nodeUrl: this.chainDocument.rpc });
+    this.provider = new RpcProvider({ nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'});
     this.dealerAccount = new Account(
       this.provider,
       configuration().dealer_wallet.address,
