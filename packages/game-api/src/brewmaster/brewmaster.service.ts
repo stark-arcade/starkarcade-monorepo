@@ -196,17 +196,15 @@ export class BrewMasterService {
     const client = this.sockets.find((i) => i.socket == socket);
 
     if (client == undefined) return;
-
     // currently will show message that is sent by client directly. Future will get content from server
     client.socket.emit('twitterRequestCallback', message);
   }
+
 
   async handlePlayerInputLink(socket: Socket, url: string) {
     const client = this.sockets.find((i) => i.socket == socket);
 
     if (client == undefined) return;
-
     // Save the link to server
-
   }
 }
