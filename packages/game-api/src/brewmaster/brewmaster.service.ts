@@ -8,10 +8,7 @@ import { getClaimPointMessage } from '@app/shared/utils';
 import { Web3Service } from '@app/web3/web3.service';
 import { Account, ec, json, stark, RpcProvider, hash, CallData } from 'starknet';
 import configuration from '@app/shared/configuration';
-import axios from 'axios';
 import * as dotenv from 'dotenv';
-import OAuth from 'oauth-1.0a';
-import crypto from 'crypto';
 
 export type StarkSweepParam = {
   socket: Socket;
@@ -200,71 +197,8 @@ export class BrewMasterService {
 
     if (client == undefined) return;
 
-    // currently will show message that is sended by client directly. Future will get content from server
+    // currently will show message that is sent by client directly. Future will get content from server
     client.socket.emit('twitterRequestCallback', message);
-  }
-
-  extractTweetId(tweetUrl: string): string {
-    if(typeof(tweetUrl) !== 'string') 
-    {
-      tweetUrl = String(tweetUrl);
-      console.log(tweetUrl);
-    }
-
-    const urlParts = tweetUrl.split('/');
-    return urlParts[urlParts.length - 1]; // The last part is the tweet ID
-  }
-  async getTweetContent(tweetUrl: string) {
-    // Initialize OAuth
-    const oauth = new OAuth({
-      consumer: {
-        key: 'Xl43f4DrqPscsmSqerwntoAy8', // Replace with your API Key
-        secret: 'mTxdTwkaNIfMFQoPANMC5NEPXlvdT2QXDk18t8vuEkHJQXVqCd', // Replace with your API Key Secret
-      },
-      signature_method: 'HMAC-SHA1',
-      hash_function(base_string, key) {
-        return crypto.createHmac('sha1', key).update(base_string).digest('base64');
-      },
-    });
-
-    const token = {
-      key: '1366629980260605954-6p8ieHmbXR5KDtRS01BQ5ewWgNHrII', // Replace with your Access Token
-      secret: 'mM2qNBLG4fUkdaAigu7WiT4X8eTZuZ800huEslrDc6EWa', // Replace with your Access Token Secret
-    };
-    
-    const tweetId = this.extractTweetId(tweetUrl);
-    const requestData = {
-      url: `https://api.twitter.com/1.1/tweets/${tweetId}?tweet.fields=text`,
-      method: 'GET',
-    };
-    const oauthHeaders = oauth.toHeader(oauth.authorize(requestData, token));
-    const headers = {
-      ...oauthHeaders, // Spread the OAuth headers
-      'Content-Type': 'application/json', // Add any additional headers
-    };
-
-    try {
-      const response = await axios.get(requestData.url, { headers })
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching tweet:', error);
-    }
-
-    // const BEARER_TOKEN = 'AAAAAAAAAAAAAAAAAAAAABMbvgEAAAAAg%2F0jxqEKtirKhnBAC8zLFmk%2F7jQ%3D79pPYYjQsdp8dLeLVD8NhjMjiHv16W6MVNTVQtBTK2SYAXZuKi'; 
-    // const url = `https://api.x.com/2/tweets/${tweetId}?tweet.fields=text`;
-
-    // try
-    // {
-    //   const response = await axios.get(url, {
-    //     headers: {
-    //       'Authorization': `Bearer ${BEARER_TOKEN}`
-    //     }
-    //   });
-    //   return response.data;
-    // } catch (error) {
-    //   console.error('Error fetching tweet:', error);
-    // }
-    // console.log(`Bearer ${BEARER_TOKEN}`)
   }
 
   async handlePlayerInputLink(socket: Socket, url: string) {
@@ -272,8 +206,7 @@ export class BrewMasterService {
 
     if (client == undefined) return;
 
-    this.getTweetContent(url).then(data => {
-      console.log(data.text);
-    });
+    // Save the link to server
+
   }
 }
